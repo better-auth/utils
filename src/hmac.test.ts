@@ -15,7 +15,9 @@ describe("hmac module", () => {
 	});
 
 	it("signs data using HMAC", async () => {
-		signature = await hmac.sign(testKey, testData);
+		signature = await hmac.sign(testKey, {
+			data: testData
+		});
 		expect(signature).toBeInstanceOf(ArrayBuffer);
 		expect(signature.byteLength).toBeGreaterThan(0);
 	});
