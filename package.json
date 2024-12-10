@@ -7,6 +7,7 @@
   "module": "./dist/index.mjs",
   "scripts": {
     "test": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check . --write"
   },
