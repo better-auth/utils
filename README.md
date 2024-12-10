@@ -20,6 +20,7 @@ utilities provided by `@better-auth/utils`:
 | [**RSA**](#rsa)   | Perform encryption, decryption, signing, and verification with RSA keys. |
 | [**ECDSA**](#ecdsa) | Perform signing and verification with ECDSA keys. |
 | [**Base64**](#base64) | Encode and decode data in base64 format.          |
+| [**Hex**](#hex)   | Encode and decode data in hexadecimal format.      |
 | [**OTP**](#otp) | Generate and verify one-time passwords.            |
 | [**Cookies**](#cookies) | Parse, serialize, and manage HTTP cookies.         |
 
@@ -253,6 +254,28 @@ const decodedData = await base64.decode(encodedData);
 
 It automatically detects if the input is URL-safe and includes padding characters.
 
+
+## Hex
+
+Hex utilities provide a simple interface to encode and decode data in hexadecimal format.
+
+### Encoding
+
+Encode data in hexadecimal format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
+
+```ts
+import { hex } from "@better-auth/utils/hex";
+
+const encodedData = hex.encode("Data to encode");
+```
+
+### Decoding
+
+Decode hexadecimal-encoded data. Input can be a string or `ArrayBuffer`.
+
+```ts
+const decodedData = hex.decode(encodedData);
+```
 
 ## OTP
 

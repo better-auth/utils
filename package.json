@@ -55,6 +55,10 @@
       "import": "./dist/ecdsa.mjs",
       "require": "./dist/ecdsa.cjs"
     },
+    "./hex": {
+      "import": "./dist/hex.mjs",
+      "require": "./dist/hex.cjs"
+    },
     "./hmac": {
       "import": "./dist/hmac.mjs",
       "require": "./dist/hmac.cjs"
