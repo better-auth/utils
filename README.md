@@ -1,6 +1,6 @@
 # Better Auth Utils
 
-A simple typescript API for common auth related operations built on top of Web Crypto API.
+A simple typescript API for common auth utilities like hashing, encryption, encoding, and OTP generation.
 
 It integrates [uncrypto](https://github.com/unjs/uncrypto) to provide a unified API for both Node.js (using the Crypto module) and web environments (using the Web Crypto API) through Conditional Exports.
 
@@ -22,7 +22,6 @@ utilities provided by `@better-auth/utils`:
 | [**Base64**](#base64) | Encode and decode data in base64 format.          |
 | [**Hex**](#hex)   | Encode and decode data in hexadecimal format.      |
 | [**OTP**](#otp) | Generate and verify one-time passwords.            |
-| [**Cookies**](#cookies) | Parse, serialize, and manage HTTP cookies.         |
 
 ## Digest
 
@@ -44,45 +43,55 @@ const hashInBase64 = await base64.encode(await digest("text", "SHA-512"));
 
 ## HMAC
 
-HMAC provides a way to hash an input using sha family hash functions with a secret key. It provides `sign`, `verify` and `createHmac` utilities.
+The HMAC utility allows you to securely hash data using a secret key and SHA family hash functions. It provides methods to `sign`, `verify`, and `create` a customized HMAC instance with specific hashing algorithms and encoding formats.
 
-### Import Key
+### Create HMAC
+
+To create an HMAC instance, use the createHMAC function. You can specify the SHA family algorithm ("SHA-256", "SHA-384", or "SHA-512") and the desired encoding format ("none", "hex", "base64", "base64url", or "base64urlnopad").
 
 It takes a secret key and returns a key object which could be used to sign and verify data.
 
 ```ts
-const secretKey = "my-secret-key" // it could also be a buffer
-const key = await hmac.importKey("SHA-256", secretKey);
+import { createHMAC } from './hmac';
+
+const hmac = createHMAC("SHA-256", "hex"); // Customize algorithm and encoding
+```
+
+### Import Key
+
+The importKey method takes a secret key (string, buffer, or typed array) and returns a CryptoKey object that can be used for signing and verifying data.
+  
+```ts
+const secretKey = "my-secret-key"; // Can also be a buffer or TypedArray
+const key = await hmac.importKey(secretKey);
 ```
 
 ### Sign
 
-It takes secret key and data to sign. It returns a signature which could be used to verify the data.
+The sign method takes a secret key (or CryptoKey) and data to generate a signature. If you provide a raw secret key, it will automatically be imported.
 
 ```ts
-const key = await hmac.importKey("SHA-256", secretKey);
-const signature = await hmac.sign(key, {
-    data: "text"
-});
+const key = await hmac.importKey("my-secret-key");
+const signature = await hmac.sign(key, "text to sign");
+console.log(signature); // Encoded based on the selected encoding format (e.g., hex)
 ```
 
-You could also directly sign using secret key.
+You could also directly sign using the raw string secret key.
 
 ```ts
-const signature2 = await hmac.sign(secretKey,{
+const signature2 = await hmac.sign("secret-key",{
     data: "text"
 });
 ```
 
 ### Verify
 
-It takes object with signature and data. This is useful so you don't accidentally swap the order of signature and data.
+The verify method checks if a given signature matches the data using the secret key. You can provide either a raw secret key or a CryptoKey.
 
 ```ts
-const isValid = await hmac.verify(key, {
-    signature,
-    data: "text"
-});
+const key = await hmac.importKey("my-secret-key");
+const isValid = await hmac.verify(key, "text to sign", signature);
+console.log(isValid); // true or false
 ```
 
 ## Random String
@@ -332,76 +341,6 @@ const secret = "my-super-secret-key";
 const label = "My Account";
 
 const qrCodeUrl = generateQRCode(secret, label);
-```
-
-## Cookies
-
-A utility for working with HTTP cookies, offering functionalities to parse, serialize, and manage cookies with optional signing for security.
-
-### Parsing Cookies
-
-Parses a Set-Cookie header string into a Map of cookie names and their attributes.
-
-```ts
-import { cookies } from "@better-auth/utils/cookies";
-
-const setCookie = "sessionId=abc123; Max-Age=3600; Secure; HttpOnly";
-const parsedCookies = cookies.parseSetCookies(setCookie);
-```
-
-You can also parse a signed cookie to verify its integrity and authenticity.
-
-```ts
-import { parseCookie } from "@better-auth/utils/cookies";
-
-const cookie = parseCookei("name=value.signature");
-```
-
-### Serializing Cookies
-
-Creates a Set-Cookie string with optional signing.
-
-```ts
-const serializedCookie = await cookies.serializeCookie({
-  name: "sessionId",
-  value: "abc123",
-  attributes: { secure: true, httpOnly: true },
-  signed: { key: "my-secret-key" },
-});
-
-console.log(serializedCookie);
-```
-
-### Verify Signed Cookie
-
-Validates a signed cookie by verifying its signature.
-
-```ts
-const isValid = cookies.verifySignedCookie({
-  cookie: "sessionId=abc123.abcdef",
-  key: "my-secret-key",
-});
-console.log(isValid); // true or false
-```
-
-### Parse set-cookie header
-
-Extracts and decodes cookies from a Cookie header.
-
-```ts
-const cookieHeader = "sessionId=abc123";
-const parsed = await cookies.parseCookies(cookieHeader, "sessionId");
-console.log(parsed.get("sessionId")); // "abc123"
-```
-
-### Get cookie
-
-Retrieves the value of a specific cookie by name, optionally verifying its signature.
-
-```ts
-const cookieHeader = "sessionId=abc123";
-const value = await cookies.getCookie(cookieHeader, "sessionId");
-console.log(value); // "abc123"
 ```
 
 ## License

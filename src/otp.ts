@@ -1,4 +1,4 @@
-import { hmac } from "./hmac";
+import { createHMAC } from "./hmac";
 import type { SHAFamily } from "./type";
 
 const defaultPeriod = 30;
@@ -23,10 +23,7 @@ export async function generateHOTP(
 	const buffer = new ArrayBuffer(8);
 	new DataView(buffer).setBigUint64(0, BigInt(counter), false);
 	const bytes = new Uint8Array(buffer);
-	const hmacResult = new Uint8Array(await hmac.sign(secret, {
-		data: bytes,
-		hash
-	}));
+	const hmacResult = new Uint8Array(await createHMAC(hash).sign(secret, bytes));
 	const offset = hmacResult[hmacResult.length - 1] & 0x0f;
 	const truncated =
 		((hmacResult[offset] & 0x7f) << 24) |

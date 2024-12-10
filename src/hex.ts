@@ -18,20 +18,25 @@ export const hex = {
         }
         return result;
     },
-    decode: (data: string) => {
+    decode: (data: string
+        | ArrayBuffer | TypedArray
+    ) => {
         if (!data) {
             return "";
         }
-        if (data.length % 2 !== 0) {
-            throw new Error("Invalid hexadecimal string");
+        if (typeof data === "string") {
+            if (data.length % 2 !== 0) {
+                throw new Error("Invalid hexadecimal string");
+            }
+            if (!new RegExp(`^[${hexadecimal}]+$`).test(data)) {
+                throw new Error("Invalid hexadecimal string");
+            }
+            const result = new Uint8Array(data.length / 2);
+            for (let i = 0; i < data.length; i += 2) {
+                result[i / 2] = parseInt(data.slice(i, i + 2), 16);
+            }
+            return new TextDecoder().decode(result);
         }
-        if (!new RegExp(`^[${hexadecimal}]+$`).test(data)) {
-            throw new Error("Invalid hexadecimal string");
-        }
-        const result = new Uint8Array(data.length / 2);
-        for (let i = 0; i < data.length; i += 2) {
-            result[i / 2] = parseInt(data.slice(i, i + 2), 16);
-        }
-        return new TextDecoder().decode(result);
+        return new TextDecoder().decode(data);
     }
 }
