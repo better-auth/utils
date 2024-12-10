@@ -283,21 +283,12 @@ The OTP utility provides a simple and secure way to generate and verify one-time
 
 It's implemented based on [RFC 4226](https://tools.ietf.org/html/rfc4226) and [RFC 6238](https://tools.ietf.org/html/rfc6238).
 
-### Create OTP Generator
-
-To create an OTP generator, use the createOTP function. It allows you to specify the SHA hash algorithm (default: "SHA-1") and the number of digits in the OTP (default: 6).
-
-```ts
-import { createOTP } from "@better-auth/utils/otp";
-
-const { generateHOTP, generateTOTP, verifyTOTP } = createOTP("SHA-256", 6);
-```
-
 ### Generating HOTP
 
 HOTP generates a one-time password based on a counter value and a secret key. The counter should be incremented for each new OTP.
 
 ```ts
+import { generateHOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key";
 const counter = 1234;
 const otp = generateHOTP(secret, counter);
@@ -308,6 +299,7 @@ const otp = generateHOTP(secret, counter);
 TOTP generates a one-time password based on the current time and a secret key. The time step is typically 30 seconds.
 
 ```ts
+import { generateTOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key"
 const otp = generateTOTP(secret);
 ```
@@ -317,6 +309,7 @@ const otp = generateTOTP(secret);
 Verify a TOTP against the secret key and a specified time window. The default time window is 30 seconds.
 
 ```ts
+import { verifyTOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key"
 const isValid = verifyTOTP(secret, otp);
 ```
@@ -324,6 +317,7 @@ const isValid = verifyTOTP(secret, otp);
 You can also specify the time window in seconds.
 
 ```ts
+import { verifyTOTP } from "@better-auth/utils";
 const isValid = verifyTOTP(secret, otp, { window: 60 });
 ```
 

@@ -1,104 +1,109 @@
 import { hmac } from "./hmac";
 import type { SHAFamily } from "./type";
 
-export const createOTP = (
-	hash: SHAFamily = "SHA-1",
-	digits = 6,
-	seconds = 30,
-) => {
-	const defaultSeconds = seconds;
-	const defaultDigits = digits;
-	async function generateHOTP(
-		secret: string,
-		{
-			counter,
+const defaultPeriod = 30;
+const defaultDigits = 6;
+
+export async function generateHOTP(
+	secret: string,
+	{
+		counter,
+		digits,
+		hash = "SHA-1",
+	}: {
+		counter: number;
+		digits?: number;
+		hash?: SHAFamily;
+	},
+) {
+	const _digits = digits ?? defaultDigits;
+	if (_digits < 1 || _digits > 8) {
+		throw new TypeError("Digits must be between 1 and 8");
+	}
+	const buffer = new ArrayBuffer(8);
+	new DataView(buffer).setBigUint64(0, BigInt(counter), false);
+	const bytes = new Uint8Array(buffer);
+	const hmacResult = new Uint8Array(await hmac.sign(secret, {
+		data: bytes,
+		hash
+	}));
+	const offset = hmacResult[hmacResult.length - 1] & 0x0f;
+	const truncated =
+		((hmacResult[offset] & 0x7f) << 24) |
+		((hmacResult[offset + 1] & 0xff) << 16) |
+		((hmacResult[offset + 2] & 0xff) << 8) |
+		(hmacResult[offset + 3] & 0xff);
+	const otp = truncated % 10 ** _digits;
+	return otp.toString().padStart(_digits, "0");
+}
+
+export async function generateTOTP(
+	secret: string,
+	{
+		period = defaultPeriod,
+		digits = defaultDigits,
+	}: {
+		period?: number;
+		digits?: number;
+	},
+) {
+	const milliseconds = period * 1000;
+	const counter = Math.floor(Date.now() / milliseconds);
+	return await generateHOTP(secret, { counter, digits });
+}
+
+
+export async function verifyTOTP(
+	otp: string,
+	{
+		window = 1,
+		digits = defaultDigits,
+		secret,
+		period = defaultPeriod,
+	}: {
+		period?: number;
+		window?: number;
+		digits?: number;
+		secret: string;
+	},
+) {
+	const milliseconds = period * 1000;
+	const counter = Math.floor(Date.now() / milliseconds);
+	for (let i = -window; i <= window; i++) {
+		const generatedOTP = await generateHOTP(secret, {
+			counter: counter + i,
 			digits,
-		}: {
-			counter: number;
-			digits?: number;
-		},
-	) {
-		const _digits = digits ?? defaultDigits;
-		if (_digits < 1 || _digits > 8) {
-			throw new TypeError("Digits must be between 1 and 8");
+		});
+		if (otp === generatedOTP) {
+			return true;
 		}
-		const buffer = new ArrayBuffer(8);
-		new DataView(buffer).setBigUint64(0, BigInt(counter), false);
-		const bytes = new Uint8Array(buffer);
-		const hmacResult = new Uint8Array(await hmac.sign(secret, {
-			data: bytes,
-			hash
-		}));
-		const offset = hmacResult[hmacResult.length - 1] & 0x0f;
-		const truncated =
-			((hmacResult[offset] & 0x7f) << 24) |
-			((hmacResult[offset + 1] & 0xff) << 16) |
-			((hmacResult[offset + 2] & 0xff) << 8) |
-			(hmacResult[offset + 3] & 0xff);
-		const otp = truncated % 10 ** _digits;
-		return otp.toString().padStart(_digits, "0");
 	}
-	async function generateTOTP(
-		secret: string,
-		{
-			seconds = defaultSeconds,
-			digits = defaultDigits,
-		}: {
-			seconds?: number;
-			digits?: number;
-		},
-	) {
-		const milliseconds = seconds * 1000;
-		const counter = Math.floor(Date.now() / milliseconds);
-		return await generateHOTP(secret, { counter, digits });
-	}
+	return false;
+}
 
-	async function verifyTOTP(
-		otp: string,
-		{
-			window = 1,
-			digits = defaultDigits,
-			secret,
-			seconds = defaultSeconds,
-		}: {
-			seconds?: number;
-			window?: number;
-			digits?: number;
-			secret: string;
-		},
-	) {
-		const milliseconds = seconds * 1000;
-		const counter = Math.floor(Date.now() / milliseconds);
-		for (let i = -window; i <= window; i++) {
-			const generatedOTP = await generateHOTP(secret, {
-				counter: counter + i,
-				digits,
-			});
-			if (otp === generatedOTP) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
+/**
 	 * Generate a QR code URL for the OTP secret
 	 */
-	function generateQRCode(
+export function generateQRCode(
+	{
+		issuer,
+		account,
+		secret,
+		digit = defaultDigits,
+		period = defaultPeriod,
+	}: {
 		issuer: string,
 		account: string,
 		secret: string,
-	) {
-		const url = new URL("otpauth://totp");
-		url.searchParams.set("secret", secret);
-		url.searchParams.set("issuer", issuer);
-		url.searchParams.set("account", account);
-		return url.toString();
+		digit?: number,
+		period?: number,
 	}
-	return {
-		generateHOTP,
-		generateTOTP,
-		verifyTOTP,
-		generateQRCode
-	};
-};
+) {
+	const url = new URL("otpauth://totp");
+	url.searchParams.set("secret", secret);
+	url.searchParams.set("issuer", issuer);
+	url.searchParams.set("account", account);
+	url.searchParams.set("digits", digit.toString());
+	url.searchParams.set("period", period.toString());
+	return url.toString();
+}

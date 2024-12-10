@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { createOTP } from "./otp";
+import { generateHOTP, generateTOTP, verifyTOTP } from "./otp";
 
-const { generateHOTP, generateTOTP, verifyTOTP } = createOTP();
 describe("HOTP and TOTP Generation Tests", () => {
 	it("should generate a valid HOTP for a given counter", async () => {
 		const key = "1234567890";
@@ -47,7 +46,7 @@ describe("HOTP and TOTP Generation Tests", () => {
 		const seconds = 30;
 		const digits = 6;
 
-		const otp1 = await generateTOTP(secret, { digits, seconds });
+		const otp1 = await generateTOTP(secret, { digits, period: seconds });
 		vi.useFakeTimers();
 		await vi.advanceTimersByTimeAsync(30000);
 		const otp2 = await generateTOTP(secret, { digits });
@@ -57,7 +56,6 @@ describe("HOTP and TOTP Generation Tests", () => {
 	it("should verify correct TOTP against generated value", async () => {
 		const secret = "1234567890";
 		const totp = await generateTOTP(secret, { digits: 6 });
-
 		const isValid = await verifyTOTP(totp, { secret });
 		expect(isValid).toBe(true);
 	});
