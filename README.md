@@ -296,10 +296,12 @@ It's implemented based on [RFC 4226](https://tools.ietf.org/html/rfc4226) and [R
 HOTP generates a one-time password based on a counter value and a secret key. The counter should be incremented for each new OTP.
 
 ```ts
-import { generateHOTP } from "@better-auth/utils/otp";
+import { createOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key";
 const counter = 1234;
-const otp = generateHOTP(secret, counter);
+const otp = createOTP(secret, {
+  digits: 6,
+}).hotp(counter);
 ``` 
 
 ### Generating TOTP
@@ -307,9 +309,12 @@ const otp = generateHOTP(secret, counter);
 TOTP generates a one-time password based on the current time and a secret key. The time step is typically 30 seconds.
 
 ```ts
-import { generateTOTP } from "@better-auth/utils/otp";
+import { createOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key"
-const otp = generateTOTP(secret);
+const otp = createOTP(secret, {
+  digits: 6,
+  period: 30,
+}).totp();
 ```
 
 ### Verifying TOTP
@@ -317,29 +322,33 @@ const otp = generateTOTP(secret);
 Verify a TOTP against the secret key and a specified time window. The default time window is 30 seconds.
 
 ```ts
-import { verifyTOTP } from "@better-auth/utils/otp";
+import { createOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key"
-const isValid = verifyTOTP(secret, otp);
+const isValid = createOTP(secret, {
+  digits: 6,
+  period: 30,
+}).verify(otp);
 ```
 
 You can also specify the time window in seconds.
 
 ```ts
-import { verifyTOTP } from "@better-auth/utils";
-const isValid = verifyTOTP(secret, otp, { window: 60 });
+import { createOTP } from "@better-auth/utils";
+const isValid = createOTP(secret).verify(otp, { window: 60 });
 ```
 
-### Generate QR Code
+### Generate URL for Authenticator App
 
-Generate a QR code URL for provisioning a TOTP secret key in an authenticator app.
+Generate a URL for provisioning a TOTP secret key in an authenticator app.
+
+- `issuer` - The name of the service or app.
+- `account` - The user's email or username.
 
 ```ts
-import { generateQRCode } from "@better-auth/utils/otp";
+import { createOTP } from "@better-auth/utils/otp";
 
 const secret = "my-super-secret-key";
-const label = "My Account";
-
-const qrCodeUrl = generateQRCode(secret, label);
+const qrCodeUrl = createOTP(secret).url("my-app", "user@email.com"); 
 ```
 
 ## License

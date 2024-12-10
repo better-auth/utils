@@ -4,7 +4,7 @@ import type { SHAFamily } from "./type";
 const defaultPeriod = 30;
 const defaultDigits = 6;
 
-export async function generateHOTP(
+async function generateHOTP(
 	secret: string,
 	{
 		counter,
@@ -34,7 +34,7 @@ export async function generateHOTP(
 	return otp.toString().padStart(_digits, "0");
 }
 
-export async function generateTOTP(
+async function generateTOTP(
 	secret: string,
 	options?: {
 		period?: number;
@@ -50,7 +50,7 @@ export async function generateTOTP(
 }
 
 
-export async function verifyTOTP(
+async function verifyTOTP(
 	otp: string,
 	{
 		window = 1,
@@ -81,7 +81,7 @@ export async function verifyTOTP(
 /**
 	 * Generate a QR code URL for the OTP secret
 	 */
-export function generateQRCode(
+function generateQRCode(
 	{
 		issuer,
 		account,
@@ -103,4 +103,22 @@ export function generateQRCode(
 	url.searchParams.set("digits", digits.toString());
 	url.searchParams.set("period", period.toString());
 	return url.toString();
+}
+
+export const createOTP = (
+	secret: string,
+	opts?: {
+		digits?: number;
+		period?: number;
+	}
+) => {
+	const digits = opts?.digits ?? defaultDigits;
+	const period = opts?.period ?? defaultPeriod;
+	return {
+		hotp: (counter: number) => generateHOTP(secret, { counter, digits }),
+		totp: () => generateTOTP(secret, { digits, period }),
+		verify: (otp: string, options?: { window?: number }) =>
+			verifyTOTP(otp, { secret, digits, period, ...options }),
+		url: (issuer: string, account: string) => generateQRCode({ issuer, account, secret, digits, period }),
+	};
 }
