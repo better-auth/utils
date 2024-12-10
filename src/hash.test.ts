@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createHash } from "./digest";
+import { createHash } from "./hash";
 
 describe("digest", () => {
 	const inputString = "Hello, World!";
