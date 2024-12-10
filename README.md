@@ -60,13 +60,17 @@ It takes secret key and data to sign. It returns a signature which could be used
 
 ```ts
 const key = await hmac.importKey("SHA-256", secretKey);
-const signature = await hmac.sign(key, "text");
+const signature = await hmac.sign(key, {
+    data: "text"
+});
 ```
 
 You could also directly sign using secret key.
 
 ```ts
-const signature2 = await hmac.sign(secretKey, "text");
+const signature2 = await hmac.sign(secretKey,{
+    data: "text"
+});
 ```
 
 ### Verify
@@ -369,3 +373,7 @@ const cookieHeader = "sessionId=abc123";
 const value = await cookies.getCookie(cookieHeader, "sessionId");
 console.log(value); // "abc123"
 ```
+
+## License
+
+MIT

@@ -16,8 +16,13 @@ export const hmac = {
 	},
 	sign: async (
 		hmacKey: string | CryptoKey,
-		data: string | ArrayBuffer | TypedArray,
-		hash: SHAFamily = "SHA-256",
+		{
+			data,
+			hash = "SHA-256",
+		}: {
+			data: string | ArrayBuffer | TypedArray,
+			hash?: SHAFamily
+		}
 	) => {
 		if (typeof hmacKey === "string") {
 			hmacKey = await hmac.importKey(hash, hmacKey);
