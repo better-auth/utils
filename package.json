@@ -47,9 +47,9 @@
       "import": "./dist/cookies.mjs",
       "require": "./dist/cookies.cjs"
     },
-    "./digest": {
-      "import": "./dist/digest.mjs",
-      "require": "./dist/digest.cjs"
+    "./hash": {
+      "import": "./dist/hash.mjs",
+      "require": "./dist/hash.cjs"
     },
     "./ecdsa": {
       "import": "./dist/ecdsa.mjs",

@@ -14,7 +14,7 @@ utilities provided by `@better-auth/utils`:
 
 | Utility          | Description                                        |
 |-------------------|----------------------------------------------------|
-| [**Digest**](#digest) | Hash inputs using sha family hash functions.      |
+| [**Hash**](#hash) | Hash inputs using sha family hash functions.      |
 | [**HMAC**](#hmac) | Hash inputs using HMAC with a secret key.          |
 | [**Random String**](#random-string) | Generate random strings with a specified length and charset. |
 | [**RSA**](#rsa)   | Perform encryption, decryption, signing, and verification with RSA keys. |
@@ -23,22 +23,21 @@ utilities provided by `@better-auth/utils`:
 | [**Hex**](#hex)   | Encode and decode data in hexadecimal format.      |
 | [**OTP**](#otp) | Generate and verify one-time passwords.            |
 
-## Digest
+## Hash
 
 Digest provides a way to hash an input using sha family hash functions. It wraps over `crypto.digest` and provide utilities to encode output in hex or base 64.
 
 ```ts
-import { digest } from "@better-auth/utils/digest"
+import { createHash } from "@better-auth/utils/digest"
 
-const hashBuffer = await digest("text", "SHA-256"); // "SHA1" | "SHA512" | "SHA382"
-const hashInHex = await digest("text", "SHA-512", "hex"); // "raw" (default) 
+const hashBuffer = await createHash("SHA-256").digest("text");
+const hashInHex = await createHash("SHA-256", "hex").digest("text");
 ```
 
-To encode output in base64, you should use `base64` utility on the output buffer.
+To encode output in base64
 
 ```ts
-import { base64 } from "@better-auth/utils/base64"
-const hashInBase64 = await base64.encode(await digest("text", "SHA-512"));
+const hashInBase64 = await createHash("SHA-256", "base64").digest("text");
 ```
 
 ## HMAC
