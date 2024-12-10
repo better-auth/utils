@@ -23,5 +23,10 @@
 				"noUselessTypeConstraint": "warn"
 			}
 		}
+	},
+	"files": {
+		"ignore": [
+			"dist"
+		]
 	}
 }
