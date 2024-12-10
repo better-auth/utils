@@ -1,0 +1,73 @@
+{
+  "name": "@better-auth/utils",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "A collection of utilities for better-auth",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "scripts": {
+    "test": "vitest",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write"
+  },
+  "keywords": [
+    "auth",
+    "utils",
+    "typescript",
+    "better-auth",
+    "better-auth-utils"
+  ],
+  "author": "Bereket Engida",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/better-auth/utils"
+  },
+  "dependencies": {
+    "unbuild": "^2.0.0",
+    "uncrypto": "^0.1.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.1",
+    "happy-dom": "^15.11.7",
+    "vitest": "^2.1.8"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./base64": {
+      "import": "./dist/base64.mjs",
+      "require": "./dist/base64.cjs"
+    },
+    "./cookies": {
+      "import": "./dist/cookies.mjs",
+      "require": "./dist/cookies.cjs"
+    },
+    "./digest": {
+      "import": "./dist/digest.mjs",
+      "require": "./dist/digest.cjs"
+    },
+    "./ecdsa": {
+      "import": "./dist/ecdsa.mjs",
+      "require": "./dist/ecdsa.cjs"
+    },
+    "./hmac": {
+      "import": "./dist/hmac.mjs",
+      "require": "./dist/hmac.cjs"
+    },
+    "./otp": {
+      "import": "./dist/otp.mjs",
+      "require": "./dist/otp.cjs"
+    },
+    "./random": {
+      "import": "./dist/random.mjs",
+      "require": "./dist/random.cjs"
+    },
+    "./rsa": {
+      "import": "./dist/rsa.mjs",
+      "require": "./dist/rsa.cjs"
+    }
+  }
+}
