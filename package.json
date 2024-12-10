@@ -9,6 +9,7 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
+    "build": "unbuild",
     "lint:fix": "biome check . --write"
   },
   "keywords": [
