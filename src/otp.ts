@@ -38,13 +38,14 @@ export const createOTP = (
 	async function generateTOTP(
 		secret: string,
 		{
-			milliseconds = 3000,
+			seconds = defaultSeconds,
 			digits = defaultDigits,
 		}: {
-			milliseconds?: number;
+			seconds?: number;
 			digits?: number;
 		},
 	) {
+		const milliseconds = seconds * 1000;
 		const counter = Math.floor(Date.now() / milliseconds);
 		return await generateHOTP(secret, { counter, digits });
 	}
