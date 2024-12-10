@@ -8,12 +8,6 @@ importers:
 
   .:
     dependencies:
-      bumpp:
-        specifier: ^9.9.0
-        version: 9.9.0
-      unbuild:
-        specifier: ^2.0.0
-        version: 2.0.0(typescript@5.7.2)
       uncrypto:
         specifier: ^0.1.3
         version: 0.1.3
@@ -24,9 +18,15 @@ importers:
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.1
+      bumpp:
+        specifier: ^9.9.0
+        version: 9.9.0
       happy-dom:
         specifier: ^15.11.7
         version: 15.11.7
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.7.2)
       vitest:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@22.10.1)(happy-dom@15.11.7)
