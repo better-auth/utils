@@ -25,7 +25,10 @@ export const createOTP = (
 		const buffer = new ArrayBuffer(8);
 		new DataView(buffer).setBigUint64(0, BigInt(counter), false);
 		const bytes = new Uint8Array(buffer);
-		const hmacResult = new Uint8Array(await hmac.sign(secret, bytes, hash));
+		const hmacResult = new Uint8Array(await hmac.sign(secret, {
+			data: bytes,
+			hash
+		}));
 		const offset = hmacResult[hmacResult.length - 1] & 0x0f;
 		const truncated =
 			((hmacResult[offset] & 0x7f) << 24) |
