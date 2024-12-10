@@ -98,6 +98,7 @@ export const base64 = {
 	async decode(data: string) {
 		const isUrlSafe = data.includes("-") || data.includes("_");
 		const alphabet = getAlphabet(isUrlSafe);
-		return base64Decode(data, alphabet);
+		const decoded = base64Decode(data, alphabet);
+		return new TextDecoder().decode(decoded);
 	},
 };
