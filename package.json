@@ -71,5 +71,8 @@
       "import": "./dist/rsa.mjs",
       "require": "./dist/rsa.cjs"
     }
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
