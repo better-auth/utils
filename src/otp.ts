@@ -80,9 +80,25 @@ export const createOTP = (
 		}
 		return false;
 	}
+
+	/**
+	 * Generate a QR code URL for the OTP secret
+	 */
+	function generateQRCode(
+		issuer: string,
+		account: string,
+		secret: string,
+	) {
+		const url = new URL("otpauth://totp");
+		url.searchParams.set("secret", secret);
+		url.searchParams.set("issuer", issuer);
+		url.searchParams.set("account", account);
+		return url.toString();
+	}
 	return {
 		generateHOTP,
 		generateTOTP,
 		verifyTOTP,
+		generateQRCode
 	};
 };
