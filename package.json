@@ -43,10 +43,6 @@
       "import": "./dist/base64.mjs",
       "require": "./dist/base64.cjs"
     },
-    "./cookies": {
-      "import": "./dist/cookies.mjs",
-      "require": "./dist/cookies.cjs"
-    },
     "./hash": {
       "import": "./dist/hash.mjs",
       "require": "./dist/hash.cjs"
