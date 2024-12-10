@@ -35,12 +35,12 @@ describe("base64", () => {
 	describe("decode", () => {
 		it("decodes a base64 string to a Uint8Array", async () => {
 			const result = await base64.decode(base64Encoded);
-			expect(new TextDecoder().decode(result)).toBe(plainText);
+			expect(result).toBe(plainText);
 		});
 
 		it("decodes a base64 URL-safe string to a Uint8Array", async () => {
 			const result = await base64.decode(base64UrlEncoded);
-			expect(new TextDecoder().decode(result)).toBe(plainText);
+			expect(result).toBe(plainText);
 		});
 
 		it("throws an error for invalid characters", async () => {
