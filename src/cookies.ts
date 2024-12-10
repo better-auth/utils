@@ -103,13 +103,15 @@ export const cookies = {
 		const { name, value, attributes } = input;
 		const opt = { ...attributes };
 		const signature = input.signed
-			? await hmac.sign(input.signed.key, value)
+			? await hmac.sign(input.signed.key, {
+				data: value,
+			})
 			: undefined;
 		const base64Signature = signature
 			? await base64.encode(signature, {
-					urlSafe: true,
-					padding: false,
-				})
+				urlSafe: true,
+				padding: false,
+			})
 			: undefined;
 		const _value = base64Signature ? `${value}.${base64Signature}` : value;
 		let cookie = `${name}=${encodeURIComponent(_value)}`;

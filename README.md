@@ -16,7 +16,7 @@ utilities provided by `@better-auth/utils`:
 |-------------------|----------------------------------------------------|
 | [**Digest**](#digest) | Hash inputs using sha family hash functions.      |
 | [**HMAC**](#hmac) | Hash inputs using HMAC with a secret key.          |
-| [**Random String**](#random-string) | Generate random strings with a specified length and charset. |
+| [**Random**](#random-string) | Generate random strings with a specified length and charset. |
 | [**RSA**](#rsa)   | Perform encryption, decryption, signing, and verification with RSA keys. |
 | [**ECDSA**](#ecdsa) | Perform signing and verification with ECDSA keys. |
 | [**Base64**](#base64) | Encode and decode data in base64 format.          |
