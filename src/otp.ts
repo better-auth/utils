@@ -89,13 +89,13 @@ export function generateQRCode(
 		issuer,
 		account,
 		secret,
-		digit = defaultDigits,
+		digits = defaultDigits,
 		period = defaultPeriod,
 	}: {
 		issuer: string,
 		account: string,
 		secret: string,
-		digit?: number,
+		digits?: number,
 		period?: number,
 	}
 ) {
@@ -103,7 +103,7 @@ export function generateQRCode(
 	url.searchParams.set("secret", secret);
 	url.searchParams.set("issuer", issuer);
 	url.searchParams.set("account", account);
-	url.searchParams.set("digits", digit.toString());
+	url.searchParams.set("digits", digits.toString());
 	url.searchParams.set("period", period.toString());
 	return url.toString();
 }
