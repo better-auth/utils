@@ -39,17 +39,17 @@ export async function generateHOTP(
 
 export async function generateTOTP(
 	secret: string,
-	{
-		period = defaultPeriod,
-		digits = defaultDigits,
-	}: {
+	options?: {
 		period?: number;
 		digits?: number;
-	},
+		hash?: SHAFamily;
+	}
 ) {
+	const digits = options?.digits ?? defaultDigits;
+	const period = options?.period ?? defaultPeriod;
 	const milliseconds = period * 1000;
 	const counter = Math.floor(Date.now() / milliseconds);
-	return await generateHOTP(secret, { counter, digits });
+	return await generateHOTP(secret, { counter, digits, hash: options?.hash });
 }
 
 
