@@ -20,7 +20,7 @@ utilities provided by `@better-auth/utils`:
 | [**RSA**](#rsa)   | Perform encryption, decryption, signing, and verification with RSA keys. |
 | [**ECDSA**](#ecdsa) | Perform signing and verification with ECDSA keys. |
 | [**Base64**](#base64) | Encode and decode data in base64 format.          |
-| [**otp**](#otp) | Generate and verify one-time passwords.            |
+| [**OTP**](#otp) | Generate and verify one-time passwords.            |
 | [**Cookies**](#cookies) | Parse, serialize, and manage HTTP cookies.         |
 
 ## Digest
