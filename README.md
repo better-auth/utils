@@ -97,7 +97,7 @@ Random crypto secure string generator. It wraps over `crypto.getRandomValues` an
 
 1. first create a random string generator with desired charset.
 ```ts
-import { createRandomStringGenerator } from "@better-auth/utils/random-string"
+import { createRandomStringGenerator } from "@better-auth/utils/random"
 
 export const generateRandomString = createRandomStringGenerator("A-Z", "0-9", "a-z", "-_") 
 ```
