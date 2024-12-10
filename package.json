@@ -1,6 +1,6 @@
 {
   "name": "@better-auth/utils",
-  "version": "0.1.19",
+  "version": "0.2.0",
   "license": "MIT",
   "description": "A collection of utilities for better-auth",
   "main": "./dist/index.cjs",
