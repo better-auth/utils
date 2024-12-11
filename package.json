@@ -43,6 +43,10 @@
       "import": "./dist/base64.mjs",
       "require": "./dist/base64.cjs"
     },
+    "./binary": {
+      "import": "./dist/binary.mjs",
+      "require": "./dist/binary.cjs"
+    },
     "./hash": {
       "import": "./dist/hash.mjs",
       "require": "./dist/hash.cjs"
