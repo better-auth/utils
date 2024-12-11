@@ -1,3 +1,5 @@
+//inspired by oslo implementation by pilcrowonpaper: https://github.com/pilcrowonpaper/oslo/blob/main/src/encoding/base64.ts
+
 import type { TypedArray } from "./type";
 
 function createDecodeMap(alphabet: string): Map<string, number> {
