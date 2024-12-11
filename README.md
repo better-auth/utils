@@ -21,6 +21,7 @@ utilities provided by `@better-auth/utils`:
 | [**Hex**](#hex)   | Encode and decode data in hexadecimal format.      |
 | [**OTP**](#otp) | Generate and verify one-time passwords.            |
 
+
 ## Hash
 
 Digest provides a way to hash an input using sha family hash functions. It wraps over `crypto.digest` and provide utilities to encode output in hex or base 64.
@@ -228,61 +229,6 @@ const isValid = await ecdsa.verify(publicKey, {
 });
 ```
 
-## Base64
-
-Base64 utilities provide a simple interface to encode and decode data in base64 format.
-
-### Encoding
-
-Encode data in base64 format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
-
-```ts
-import { base64 } from "@better-auth/utils/base64";
-
-const encodedData = base64.encode("Data to encode");
-```
-
-options:
-- `urlSafe` - URL-safe encoding, replacing `+` with `-` and `/` with `_`.
-- `padding` - Include padding characters (`=`) at the end of the encoded string
-
-```ts
-const encodedData = base64.encode("Data to encode", { url: true, padding: false });
-```
-
-### Decoding
-
-Decode base64-encoded data. Input can be a string or `ArrayBuffer`.
-
-```ts
-const decodedData = await base64.decode(encodedData);
-```
-
-It automatically detects if the input is URL-safe and includes padding characters.
-
-
-## Hex
-
-Hex utilities provide a simple interface to encode and decode data in hexadecimal format.
-
-### Encoding
-
-Encode data in hexadecimal format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
-
-```ts
-import { hex } from "@better-auth/utils/hex";
-
-const encodedData = hex.encode("Data to encode");
-```
-
-### Decoding
-
-Decode hexadecimal-encoded data. Input can be a string or `ArrayBuffer`.
-
-```ts
-const decodedData = hex.decode(encodedData);
-```
-
 ## OTP
 
 The OTP utility provides a simple and secure way to generate and verify one-time passwords (OTPs), commonly used in multi-factor authentication (MFA) systems. It includes support for both HOTP (HMAC-based One-Time Password) and TOTP (Time-based One-Time Password) standards.
@@ -347,6 +293,90 @@ import { createOTP } from "@better-auth/utils/otp";
 
 const secret = "my-super-secret-key";
 const qrCodeUrl = createOTP(secret).url("my-app", "user@email.com"); 
+```
+
+
+## Base64
+
+Base64 utilities provide a simple interface to encode and decode data in base64 format.
+
+### Encoding
+
+Encode data in base64 format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
+
+```ts
+import { base64 } from "@better-auth/utils/base64";
+
+const encodedData = base64.encode("Data to encode");
+```
+
+options:
+- `padding` - Include padding characters (`=`) at the end of the encoded string
+
+```ts
+const encodedData = base64.encode("Data to encode", { url: true, padding: false });
+```
+
+### Decoding
+
+Decode base64-encoded data. Input can be a string or `ArrayBuffer`.
+
+```ts
+const decodedData = await base64.decode(encodedData);
+```
+
+It automatically detects if the input is URL-safe and includes padding characters.
+
+### Base64Url
+
+Url safe alternative
+
+```ts
+import { base64Url } from "@better-auth/utils/base64";
+
+const encodedData = base64Url.encode("Data to encode");
+```
+
+## Hex
+
+Hex utilities provide a simple interface to encode and decode data in hexadecimal format.
+
+### Encoding
+
+Encode data in hexadecimal format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
+
+```ts
+import { hex } from "@better-auth/utils/hex";
+
+const encodedData = hex.encode("Data to encode");
+```
+
+### Decoding
+
+Decode hexadecimal-encoded data. Input can be a string or `ArrayBuffer`.
+
+```ts
+const decodedData = hex.decode(encodedData);
+```
+
+## Binary
+
+A utilities provide a simple interface to encode and decode data in binary format. It uses `TextEncode` and `TextDecoder` to encode and decode data respectively.
+
+### Encoding
+
+```ts
+import { binary } from "@better-auth/util/binary"
+
+const data = binary.encode("Hello World!")
+```
+
+### Decoding
+
+```ts
+import { binary } from "@better-auth/util/binary"
+
+const data = binary.decode(new Unit8Array([[72, 101, 108, 108, 111]]))
 ```
 
 ## License
