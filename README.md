@@ -17,10 +17,10 @@ utilities provided by `@better-auth/utils`:
 | [**Random String**](#random-string) | Generate random strings with a specified length and charset. |
 | [**RSA**](#rsa)   | Perform encryption, decryption, signing, and verification with RSA keys. |
 | [**ECDSA**](#ecdsa) | Perform signing and verification with ECDSA keys. |
+| [**OTP**](#otp) | Generate and verify one-time passwords.            |
 | [**Base64**](#base64) | Encode and decode data in base64 format.          |
 | [**Hex**](#hex)   | Encode and decode data in hexadecimal format.      |
-| [**OTP**](#otp) | Generate and verify one-time passwords.            |
-
+| [**Binary**](#binary) | Encode and decode data in binary format.            |
 
 ## Hash
 
