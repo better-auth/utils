@@ -39,6 +39,10 @@
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		},
+		"./base32": {
+			"import": "./dist/base32.mjs",
+			"require": "./dist/base32.cjs"
+		},
 		"./base64": {
 			"import": "./dist/base64.mjs",
 			"require": "./dist/base64.cjs"
@@ -76,5 +80,7 @@
 			"require": "./dist/rsa.cjs"
 		}
 	},
-	"files": ["dist"]
+	"files": [
+		"dist"
+	]
 }
