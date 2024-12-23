@@ -161,33 +161,3 @@ export const base32hex = {
 		return base32Decode(data, alphabet);
 	},
 };
-
-/** @deprecated Use `base32.encode()` instead */
-export function encodeBase32(
-	data: ArrayBuffer | TypedArray,
-	options?: { padding?: boolean },
-): string {
-	return base32.encode(data, {
-		padding: options?.padding ?? true,
-	});
-}
-
-/** @deprecated Use `base32.decode()` instead */
-export function decodeBase32(data: string): Uint8Array {
-	return base32.decode(data);
-}
-
-/** @deprecated Use `base32hex.encode()` instead */
-export function encodeBase32hex(
-	data: ArrayBuffer | TypedArray,
-	options?: { padding?: boolean },
-): string {
-	return base32hex.encode(data, {
-		padding: options?.padding ?? true,
-	});
-}
-
-/** @deprecated Use `base32hex.decode()` instead */
-export function decodeBase32hex(data: string): Uint8Array {
-	return base32hex.decode(data);
-}

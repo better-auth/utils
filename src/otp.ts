@@ -94,13 +94,23 @@ function generateQRCode({
 	digits?: number;
 	period?: number;
 }) {
-	const url = new URL("otpauth://totp");
-	url.searchParams.set("secret", secret);
-	url.searchParams.set("issuer", issuer);
-	url.searchParams.set("account", account);
-	url.searchParams.set("digits", digits.toString());
-	url.searchParams.set("period", period.toString());
-	return url.toString();
+	const encodedIssuer = encodeURIComponent(issuer);
+	const encodedAccountName = encodeURIComponent(account);
+	const baseURI = `otpauth://totp/${encodedIssuer}:${encodedAccountName}`;
+	const params = new URLSearchParams({
+		secret: base32.encode(secret, {
+			padding: false,
+		}),
+		issuer,
+	});
+
+	if (digits !== undefined) {
+		params.set("digits", digits.toString());
+	}
+	if (period !== undefined) {
+		params.set("period", period.toString());
+	}
+	return `${baseURI}?${params.toString()}`;
 }
 
 export const createOTP = (

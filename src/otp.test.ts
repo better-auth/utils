@@ -87,4 +87,13 @@ describe("HOTP and TOTP Generation Tests", () => {
 		const isValid = await createOTP(secret).verify(totp, { window: -1 });
 		expect(isValid).toBe(false);
 	});
+
+	it("should generate a valid QR code URL", () => {
+		const secret = "1234567890";
+		const issuer = "my-site.com";
+		const account = "account";
+		const url = createOTP(secret).url(issuer, account);
+		expect(url).toBeTypeOf("string");
+		expect(url).toContain("otpauth://totp");
+	});
 });
