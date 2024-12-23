@@ -1,3 +1,4 @@
+import { base32 } from "./base32";
 import { createHMAC } from "./hmac";
 import type { SHAFamily } from "./type";
 
@@ -40,7 +41,7 @@ async function generateTOTP(
 		period?: number;
 		digits?: number;
 		hash?: SHAFamily;
-	}
+	},
 ) {
 	const digits = options?.digits ?? defaultDigits;
 	const period = options?.period ?? defaultPeriod;
@@ -48,7 +49,6 @@ async function generateTOTP(
 	const counter = Math.floor(Date.now() / milliseconds);
 	return await generateHOTP(secret, { counter, digits, hash: options?.hash });
 }
-
 
 async function verifyTOTP(
 	otp: string,
@@ -79,23 +79,21 @@ async function verifyTOTP(
 }
 
 /**
-	 * Generate a QR code URL for the OTP secret
-	 */
-function generateQRCode(
-	{
-		issuer,
-		account,
-		secret,
-		digits = defaultDigits,
-		period = defaultPeriod,
-	}: {
-		issuer: string,
-		account: string,
-		secret: string,
-		digits?: number,
-		period?: number,
-	}
-) {
+ * Generate a QR code URL for the OTP secret
+ */
+function generateQRCode({
+	issuer,
+	account,
+	secret,
+	digits = defaultDigits,
+	period = defaultPeriod,
+}: {
+	issuer: string;
+	account: string;
+	secret: string;
+	digits?: number;
+	period?: number;
+}) {
 	const url = new URL("otpauth://totp");
 	url.searchParams.set("secret", secret);
 	url.searchParams.set("issuer", issuer);
@@ -110,7 +108,7 @@ export const createOTP = (
 	opts?: {
 		digits?: number;
 		period?: number;
-	}
+	},
 ) => {
 	const digits = opts?.digits ?? defaultDigits;
 	const period = opts?.period ?? defaultPeriod;
@@ -119,6 +117,7 @@ export const createOTP = (
 		totp: () => generateTOTP(secret, { digits, period }),
 		verify: (otp: string, options?: { window?: number }) =>
 			verifyTOTP(otp, { secret, digits, period, ...options }),
-		url: (issuer: string, account: string) => generateQRCode({ issuer, account, secret, digits, period }),
+		url: (issuer: string, account: string) =>
+			generateQRCode({ issuer, account, secret, digits, period }),
 	};
-}
+};

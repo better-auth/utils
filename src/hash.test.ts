@@ -41,14 +41,18 @@ describe("digest", () => {
 		});
 
 		it("handles input as an ArrayBufferView", async () => {
-			const hash = await createHash("SHA-256").digest(new Uint8Array(inputBuffer));
+			const hash = await createHash("SHA-256").digest(
+				new Uint8Array(inputBuffer),
+			);
 			expect(hash).toBeInstanceOf(ArrayBuffer);
 		});
 	});
 
 	describe("Error handling", () => {
 		it("throws an error for unsupported hash algorithms", async () => {
-			await expect(createHash("SHA-10" as any).digest(inputString)).rejects.toThrow();
+			await expect(
+				createHash("SHA-10" as any).digest(inputString),
+			).rejects.toThrow();
 		});
 
 		it("throws an error for invalid input types", async () => {

@@ -1,14 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
 import { createOTP } from "./otp";
 
-
 describe("HOTP and TOTP Generation Tests", () => {
 	it("should generate a valid HOTP for a given counter", async () => {
 		const key = "1234567890";
 		const counter = 1;
 		const digits = 6;
 		const otp = await createOTP(key, {
-			digits
+			digits,
 		}).hotp(counter);
 		expect(otp).toBeTypeOf("string");
 		expect(otp.length).toBe(digits);
@@ -20,13 +19,13 @@ describe("HOTP and TOTP Generation Tests", () => {
 
 		await expect(
 			createOTP(key, {
-				digits: 9
-			}).hotp(counter)
+				digits: 9,
+			}).hotp(counter),
 		).rejects.toThrow("Digits must be between 1 and 8");
 		await expect(
 			createOTP(key, {
-				digits: 0
-			}).hotp(counter)
+				digits: 0,
+			}).hotp(counter),
 		).rejects.toThrow("Digits must be between 1 and 8");
 	});
 
@@ -35,7 +34,7 @@ describe("HOTP and TOTP Generation Tests", () => {
 		const digits = 6;
 
 		const otp = await createOTP(secret, {
-			digits
+			digits,
 		}).totp();
 		expect(otp).toBeTypeOf("string");
 		expect(otp.length).toBe(digits);
@@ -48,13 +47,13 @@ describe("HOTP and TOTP Generation Tests", () => {
 
 		const otp1 = await createOTP(secret, {
 			period: seconds,
-			digits
+			digits,
 		}).totp();
 		vi.useFakeTimers();
 		await vi.advanceTimersByTimeAsync(30000);
 		const otp2 = await createOTP(secret, {
 			period: seconds,
-			digits
+			digits,
 		}).totp();
 		expect(otp1).not.toBe(otp2);
 	});
