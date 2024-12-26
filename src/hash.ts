@@ -1,3 +1,4 @@
+import { subtle } from "uncrypto";
 import { base64, base64Url } from "./base64";
 import type { EncodingFormat, SHAFamily, TypedArray } from "./type";
 
@@ -11,7 +12,7 @@ export function createHash<Encoding extends EncodingFormat = "none">(
 		): Promise<Encoding extends "none" ? ArrayBuffer : string> => {
 			const encoder = new TextEncoder();
 			const data = typeof input === "string" ? encoder.encode(input) : input;
-			const hashBuffer = await crypto.subtle.digest(algorithm, data);
+			const hashBuffer = await subtle.digest(algorithm, data);
 
 			if (encoding === "hex") {
 				const hashArray = Array.from(new Uint8Array(hashBuffer));

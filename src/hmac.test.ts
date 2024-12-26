@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { createHMAC } from "./hmac";
-import { base64Url } from "./base64";
 
 describe("hmac module", () => {
 	const algorithm = "SHA-256";
