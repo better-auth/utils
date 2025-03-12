@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createRandomStringGenerator } from "./random";
+import { getRandomValues } from "uncrypto";
 
 describe("createRandomStringGenerator", () => {
 	it("generates a random string of specified length", () => {
@@ -54,5 +55,41 @@ describe("createRandomStringGenerator", () => {
 		expect([...randomString].every((char) => allowedChars.includes(char))).toBe(
 			true,
 		);
+	});
+
+	it("combines multiple alphabets when passed during generation", () => {
+		// Mock getRandomValues to return sequentially increasing values
+		vi.mock("uncrypto", () => ({
+			getRandomValues: vi.fn(
+				<T extends ArrayBufferView | null>(array: T): T => {
+					if (array instanceof Uint8Array) {
+						for (let i = 0; i < array.length; i++) {
+							array[i] = i % 256; // Predictable sequence for testing
+						}
+					}
+					return array;
+				},
+			),
+		}));
+
+		try {
+			const generator = createRandomStringGenerator("a-z");
+			// Generate a long string to ensure all characters are represented
+			const randomString = generator(256, "A-Z", "0-9");
+
+			// The combined alphabet we expect
+			const expectedAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+			// Should use all characters from the expected alphabet
+			expect(
+				[...expectedAlphabet].every((char) => randomString.includes(char)),
+			).toBe(true);
+
+			// Additionally verify that the string has expected length
+			expect(randomString).toHaveLength(256);
+		} finally {
+			// Restore the original implementation
+			vi.restoreAllMocks();
+		}
 	});
 });
