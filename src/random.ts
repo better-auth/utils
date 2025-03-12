@@ -29,10 +29,7 @@ export function createRandomStringGenerator<A extends Alphabet>(
 
 	const baseCharSetLength = baseCharacterSet.length;
 
-	return <SubA extends Alphabet>(
-		length: number,
-		...[alphabet]: [SubA?, ...SubA[]]
-	) => {
+	return <SubA extends Alphabet>(length: number, ...alphabets: SubA[]) => {
 		if (length <= 0) {
 			throw new Error("Length must be a positive integer.");
 		}
@@ -40,8 +37,8 @@ export function createRandomStringGenerator<A extends Alphabet>(
 		let characterSet = baseCharacterSet;
 		let charSetLength = baseCharSetLength;
 
-		if (alphabet) {
-			characterSet = expandAlphabet(alphabet);
+		if (alphabets.length > 0) {
+			characterSet = alphabets.map(expandAlphabet).join("");
 			charSetLength = characterSet.length;
 		}
 
