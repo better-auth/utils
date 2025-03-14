@@ -18,31 +18,28 @@ function expandAlphabet(alphabet: Alphabet): string {
 }
 
 export function createRandomStringGenerator<A extends Alphabet>(
-	...characters: A[]
+	...baseAlphabets: A[]
 ) {
-	const baseCharacterSet = characters.map(expandAlphabet).join("");
-	if (baseCharacterSet.length === 0) {
+	const baseCharSet = baseAlphabets.map(expandAlphabet).join("");
+	if (baseCharSet.length === 0) {
 		throw new Error(
 			"No valid characters provided for random string generation.",
 		);
 	}
 
-	const baseCharSetLength = baseCharacterSet.length;
+	const baseCharSetLength = baseCharSet.length;
 
-	return <SubA extends Alphabet>(
-		length: number,
-		...[alphabet]: [SubA?, ...SubA[]]
-	) => {
+	return <SubA extends Alphabet>(length: number, ...alphabets: SubA[]) => {
 		if (length <= 0) {
 			throw new Error("Length must be a positive integer.");
 		}
 
-		let characterSet = baseCharacterSet;
+		let charSet = baseCharSet;
 		let charSetLength = baseCharSetLength;
 
-		if (alphabet) {
-			characterSet = expandAlphabet(alphabet);
-			charSetLength = characterSet.length;
+		if (alphabets.length > 0) {
+			charSet = alphabets.map(expandAlphabet).join("");
+			charSetLength = charSet.length;
 		}
 
 		const charArray = new Uint8Array(length);
@@ -51,7 +48,7 @@ export function createRandomStringGenerator<A extends Alphabet>(
 		let result = "";
 		for (let i = 0; i < length; i++) {
 			const index = charArray[i] % charSetLength;
-			result += characterSet[index];
+			result += charSet[index];
 		}
 
 		return result;
