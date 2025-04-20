@@ -138,7 +138,7 @@ describe("createRandomStringGenerator", () => {
 			expect(randomString).toHaveLength(256);
 		} finally {
 			// Restore the original implementation
-			vi.restoreAllMocks();
+			vi.unmock("uncrypto");
 		}
 	});
 
