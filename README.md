@@ -27,7 +27,7 @@ utilities provided by `@better-auth/utils`:
 Digest provides a way to hash an input using sha family hash functions. It wraps over `crypto.digest` and provide utilities to encode output in hex or base 64.
 
 ```ts
-import { createHash } from "@better-auth/utils/digest"
+import { createHash } from "@better-auth/utils/hash"
 
 const hashBuffer = await createHash("SHA-256").digest("text");
 const hashInHex = await createHash("SHA-256", "hex").digest("text");
