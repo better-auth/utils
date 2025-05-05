@@ -42,13 +42,26 @@ export function createRandomStringGenerator<A extends Alphabet>(
 			charSetLength = charSet.length;
 		}
 
-		const charArray = new Uint8Array(length);
-		getRandomValues(charArray);
+		const maxValid = Math.floor(256 / charSetLength) * charSetLength;
+		const buf = new Uint8Array(length * 2);
+		const bufLength = buf.length;
 
 		let result = "";
-		for (let i = 0; i < length; i++) {
-			const index = charArray[i] % charSetLength;
-			result += charSet[index];
+		let bufIndex = bufLength;
+		let rand: number;
+
+		while (result.length < length) {
+			if (bufIndex >= bufLength) {
+				getRandomValues(buf);
+				bufIndex = 0;
+			}
+
+			rand = buf[bufIndex++];
+
+			// avoid modulo bias
+			if (rand < maxValid) {
+				result += charSet[rand % charSetLength];
+			}
 		}
 
 		return result;
