@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      typescript:
-        specifier: ^5.8.2
-        version: 5.8.2
       uncrypto:
         specifier: ^0.1.3
         version: 0.1.3
@@ -27,6 +24,9 @@ importers:
       happy-dom:
         specifier: ^15.11.7
         version: 15.11.7
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
       unbuild:
         specifier: ^2.0.0
         version: 2.0.0(typescript@5.8.2)
