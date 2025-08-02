@@ -1,11 +1,44 @@
 //inspired by oslo implementation by pilcrowonpaper: https://github.com/pilcrowonpaper/oslo/blob/main/src/encoding/base64.ts
+//refactored based on core-js implementation: https://github.com/zloirock/core-js/blob/master/packages/core-js/internals/uint8-from-base64.js
 
 import type { TypedArray } from "./type";
 
+const BASE64_ALPHABET =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const BASE64_URL_ALPHABET =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
 function getAlphabet(urlSafe: boolean): string {
-	return urlSafe
-		? "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
-		: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	return urlSafe ? BASE64_URL_ALPHABET : BASE64_ALPHABET;
+}
+
+function createDecodeMap(alphabet: string): Map<string, number> {
+	const map = new Map<string, number>();
+	for (let i = 0; i < alphabet.length; i++) {
+		map.set(alphabet[i], i);
+	}
+	return map;
+}
+
+const base64DecodeMap = createDecodeMap(BASE64_ALPHABET);
+const base64UrlDecodeMap = createDecodeMap(BASE64_URL_ALPHABET);
+
+function skipWhitespace(str: string, index: number): number {
+	const length = str.length;
+	while (index < length) {
+		const char = str[index];
+		if (
+			char !== " " &&
+			char !== "\t" &&
+			char !== "\n" &&
+			char !== "\f" &&
+			char !== "\r"
+		) {
+			break;
+		}
+		index++;
+	}
+	return index;
 }
 
 function base64Encode(
@@ -38,21 +71,49 @@ function base64Encode(
 	return result;
 }
 
-function base64Decode(data: string, alphabet: string): Uint8Array {
-	const decodeMap = new Map<string, number>();
-	for (let i = 0; i < alphabet.length; i++) {
-		decodeMap.set(alphabet[i]!, i);
-	}
+function base64Decode(
+	data: string,
+	options: { alphabet?: "base64" | "base64url"; strict?: boolean } = {},
+): Uint8Array {
+	const { alphabet = "base64", strict = false } = options;
+	const isUrlSafe = alphabet === "base64url";
+	const decodeMap = isUrlSafe ? base64UrlDecodeMap : base64DecodeMap;
 	const result: number[] = [];
 	let buffer = 0;
 	let bitsCollected = 0;
+	let index = 0;
+	const length = data.length;
 
-	for (const char of data) {
-		if (char === "=") break;
+	while (index < length) {
+		if (!strict) {
+			index = skipWhitespace(data, index);
+			if (index >= length) break;
+		}
+
+		const char = data[index];
+		if (char === "=") {
+			break;
+		}
+
 		const value = decodeMap.get(char);
 		if (value === undefined) {
-			throw new Error(`Invalid Base64 character: ${char}`);
+			if (strict) {
+				throw new SyntaxError(`Invalid Base64 character: "${char}"`);
+			}
+			// In non-strict mode, skip invalid characters if they're not whitespace
+			if (
+				char !== " " &&
+				char !== "\t" &&
+				char !== "\n" &&
+				char !== "\f" &&
+				char !== "\r"
+			) {
+				throw new SyntaxError(`Invalid Base64 character: "${char}"`);
+			}
+			index++;
+			continue;
 		}
+
 		buffer = (buffer << 6) | value;
 		bitsCollected += 6;
 
@@ -60,9 +121,39 @@ function base64Decode(data: string, alphabet: string): Uint8Array {
 			bitsCollected -= 8;
 			result.push((buffer >> bitsCollected) & 0xff);
 		}
+
+		index++;
 	}
 
-	return Uint8Array.from(result);
+	// Check for padding validation in strict mode
+	if (strict) {
+		// Skip any remaining whitespace to check for padding
+		while (
+			index < length &&
+			(data[index] === " " ||
+				data[index] === "\t" ||
+				data[index] === "\n" ||
+				data[index] === "\f" ||
+				data[index] === "\r")
+		) {
+			index++;
+		}
+
+		// Check if we have unexpected padding
+		if (index < length && data[index] === "=" && bitsCollected > 0) {
+			throw new SyntaxError('Unexpected "=" padding character');
+		}
+	}
+
+	if (strict && bitsCollected >= 6) {
+		// Check if the extra bits are all zeros (valid padding)
+		const extraBits = buffer & ((1 << bitsCollected) - 1);
+		if (extraBits !== 0) {
+			throw new SyntaxError("Invalid Base64 string: non-zero padding bits");
+		}
+	}
+
+	return new Uint8Array(result);
 }
 
 export const base64 = {
@@ -74,16 +165,26 @@ export const base64 = {
 		const buffer =
 			typeof data === "string"
 				? new TextEncoder().encode(data)
-				: new Uint8Array(data);
+				: new Uint8Array(
+						data instanceof ArrayBuffer
+							? data
+							: data.buffer.slice(
+									data.byteOffset,
+									data.byteOffset + data.byteLength,
+								),
+					);
 		return base64Encode(buffer, alphabet, options.padding ?? true);
 	},
-	decode(data: string | ArrayBuffer | TypedArray) {
+	decode(
+		data: string | ArrayBuffer | TypedArray,
+		options: { strict?: boolean } = {},
+	) {
 		if (typeof data !== "string") {
 			data = new TextDecoder().decode(data);
 		}
 		const urlSafe = data.includes("-") || data.includes("_");
-		const alphabet = getAlphabet(urlSafe);
-		return base64Decode(data, alphabet);
+		const alphabet = urlSafe ? "base64url" : "base64";
+		return base64Decode(data, { alphabet, strict: options.strict });
 	},
 };
 
@@ -96,12 +197,26 @@ export const base64Url = {
 		const buffer =
 			typeof data === "string"
 				? new TextEncoder().encode(data)
-				: new Uint8Array(data);
-		return base64Encode(buffer, alphabet, options.padding ?? true);
+				: new Uint8Array(
+						data instanceof ArrayBuffer
+							? data
+							: data.buffer.slice(
+									data.byteOffset,
+									data.byteOffset + data.byteLength,
+								),
+					);
+		return base64Encode(buffer, alphabet, options.padding ?? false);
 	},
-	decode(data: string) {
-		const urlSafe = data.includes("-") || data.includes("_");
-		const alphabet = getAlphabet(urlSafe);
-		return base64Decode(data, alphabet);
+	decode(
+		data: string | ArrayBuffer | TypedArray,
+		options: { strict?: boolean } = {},
+	) {
+		if (typeof data !== "string") {
+			data = new TextDecoder().decode(data);
+		}
+		return base64Decode(data, {
+			alphabet: "base64url",
+			strict: options.strict,
+		});
 	},
 };
