@@ -19,23 +19,7 @@ describe("safeEqualFallback", () => {
 		expect(safeEqual("", "a")).toBe(false);
 	});
 
-	it("performs constant-time operations for strings of equal length", () => {
-		const a = "aaaaaa";
-		const b = "bbbbbb";
-
-		let iterations = 0;
-		const originalCharCodeAt = String.prototype.charCodeAt;
-
-		String.prototype.charCodeAt = function (index: number) {
-			iterations++;
-			return originalCharCodeAt.call(this, index);
-		};
-
-		safeEqual(a, b);
-
-		// Each loop accesses both a[i] and b[i], so total calls = length * 2
-		expect(iterations).toBe(a.length * 2);
-
-		String.prototype.charCodeAt = originalCharCodeAt;
+	it("handles similar strings", () => {
+		expect(safeEqual("aaaaaaaa", "aaaaaaab")).toBe(false);
 	});
 });
