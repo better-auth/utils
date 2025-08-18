@@ -79,9 +79,11 @@
 		"./rsa": {
 			"import": "./dist/rsa.mjs",
 			"require": "./dist/rsa.cjs"
+		},
+		"./equal": {
+			"import": "./dist/equal.mjs",
+			"require": "./dist/equal.cjs"
 		}
 	},
-	"files": [
-		"dist"
-	]
+	"files": ["dist"]
 }
