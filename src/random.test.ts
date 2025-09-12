@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRandomStringGenerator } from "./random";
 
 // Utility functions for distribution tests
@@ -137,7 +137,7 @@ describe("createRandomStringGenerator", () => {
 			expect(randomString).toHaveLength(256);
 		} finally {
 			// Restore the original implementation
-			vi.unmock("uncrypto");
+			vi.unstubAllGlobals();
 		}
 	});
 
