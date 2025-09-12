@@ -1,6 +1,6 @@
 # Better Auth Utils
 
-A simple typescript API for common auth utilities like hashing, encryption, encoding, and OTP generation. Built on top of Web Crypto APIs and it wraps over [uncrypto](https://github.com/unjs/uncrypto) to provide a unified API for both Node.js (using the Crypto module) and web environments (using the Web Crypto API) through Conditional Exports.
+A simple typescript API for common auth utilities like hashing, encryption, encoding, and OTP generation. Built on top of Web Crypto APIs to provide a unified API for both Node.js (using the Crypto module) and web environments (using the Web Crypto API) through Conditional Exports.
 
 ```bash
 pnpm add @better-auth/utils
