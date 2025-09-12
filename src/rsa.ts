@@ -1,4 +1,4 @@
-import { subtle } from "uncrypto";
+import { getWebcryptoSubtle } from "./index";
 
 type ExportFormat = "jwk" | "spki" | "pkcs8";
 
@@ -7,7 +7,7 @@ export const rsa = {
 		modulusLength: 2048 | 4096 = 2048,
 		hash: "SHA-256" | "SHA-384" | "SHA-512" = "SHA-256",
 	) => {
-		return await subtle.generateKey(
+		return await getWebcryptoSubtle().generateKey(
 			{
 				name: "RSA-OAEP",
 				modulusLength,
@@ -22,14 +22,14 @@ export const rsa = {
 		key: CryptoKey,
 		format: E,
 	): Promise<E extends "jwk" ? JsonWebKey : ArrayBuffer> => {
-		return (await subtle.exportKey(format, key)) as any;
+		return (await getWebcryptoSubtle().exportKey(format, key)) as any;
 	},
 	importKey: async (
 		key: JsonWebKey,
 		usage: "encrypt" | "decrypt" = "encrypt",
 		hash: "SHA-256" | "SHA-384" | "SHA-512" = "SHA-256",
 	) => {
-		return await subtle.importKey(
+		return await getWebcryptoSubtle().importKey(
 			"jwk",
 			key,
 			{
@@ -46,10 +46,14 @@ export const rsa = {
 	) => {
 		const encodedData =
 			typeof data === "string" ? new TextEncoder().encode(data) : data;
-		return await subtle.encrypt({ name: "RSA-OAEP" }, key, encodedData);
+		return await getWebcryptoSubtle().encrypt(
+			{ name: "RSA-OAEP" },
+			key,
+			encodedData,
+		);
 	},
 	decrypt: async (key: CryptoKey, data: ArrayBuffer | ArrayBufferView) => {
-		return await subtle.decrypt({ name: "RSA-OAEP" }, key, data);
+		return await getWebcryptoSubtle().decrypt({ name: "RSA-OAEP" }, key, data);
 	},
 	sign: async (
 		key: CryptoKey,
@@ -58,7 +62,7 @@ export const rsa = {
 	) => {
 		const encodedData =
 			typeof data === "string" ? new TextEncoder().encode(data) : data;
-		return await subtle.sign(
+		return await getWebcryptoSubtle().sign(
 			{
 				name: "RSA-PSS",
 				saltLength,
@@ -84,7 +88,7 @@ export const rsa = {
 		}
 		const encodedData =
 			typeof data === "string" ? new TextEncoder().encode(data) : data;
-		return await subtle.verify(
+		return await getWebcryptoSubtle().verify(
 			{
 				name: "RSA-PSS",
 				saltLength,

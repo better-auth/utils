@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 import { createRandomStringGenerator } from "./random";
-import { getRandomValues } from "uncrypto";
 
 // Utility functions for distribution tests
 function generateLargeRandomSample(
@@ -108,7 +107,7 @@ describe("createRandomStringGenerator", () => {
 
 	it("combines multiple alphabets when passed during generation", () => {
 		// Mock getRandomValues to return sequentially increasing values
-		vi.mock("uncrypto", () => ({
+		vi.stubGlobal("crypto", {
 			getRandomValues: vi.fn(
 				<T extends ArrayBufferView | null>(array: T): T => {
 					if (array instanceof Uint8Array) {
@@ -119,7 +118,7 @@ describe("createRandomStringGenerator", () => {
 					return array;
 				},
 			),
-		}));
+		});
 
 		try {
 			const generator = createRandomStringGenerator("a-z");

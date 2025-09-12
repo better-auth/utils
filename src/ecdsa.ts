@@ -4,10 +4,12 @@ import type {
 	SHAFamily,
 	TypedArray,
 } from "./type";
+import { getWebcryptoSubtle } from "./index";
 
 export const ecdsa = {
 	generateKeyPair: async (curve: ECDSACurve = "P-256") => {
-		const keyPair = await crypto.subtle.generateKey(
+		const subtle = getWebcryptoSubtle();
+		const keyPair = await subtle.generateKey(
 			{
 				name: "ECDSA",
 				namedCurve: curve,
@@ -15,11 +17,8 @@ export const ecdsa = {
 			true,
 			["sign", "verify"],
 		);
-		const privateKey = await crypto.subtle.exportKey(
-			"pkcs8",
-			keyPair.privateKey,
-		);
-		const publicKey = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+		const privateKey = await subtle.exportKey("pkcs8", keyPair.privateKey);
+		const publicKey = await subtle.exportKey("spki", keyPair.publicKey);
 		return { privateKey, publicKey };
 	},
 	importPrivateKey: async (
@@ -30,7 +29,7 @@ export const ecdsa = {
 		if (typeof privateKey === "string") {
 			privateKey = new TextEncoder().encode(privateKey);
 		}
-		return await crypto.subtle.importKey(
+		return await getWebcryptoSubtle().importKey(
 			"pkcs8",
 			privateKey,
 			{
@@ -49,7 +48,7 @@ export const ecdsa = {
 		if (typeof publicKey === "string") {
 			publicKey = new TextEncoder().encode(publicKey);
 		}
-		return await crypto.subtle.importKey(
+		return await getWebcryptoSubtle().importKey(
 			"spki",
 			publicKey,
 			{
@@ -68,7 +67,7 @@ export const ecdsa = {
 		if (typeof data === "string") {
 			data = new TextEncoder().encode(data);
 		}
-		const signature = await crypto.subtle.sign(
+		const signature = await getWebcryptoSubtle().sign(
 			{
 				name: "ECDSA",
 				hash: { name: hash },
@@ -97,7 +96,7 @@ export const ecdsa = {
 		if (typeof data === "string") {
 			data = new TextEncoder().encode(data);
 		}
-		return await crypto.subtle.verify(
+		return await getWebcryptoSubtle().verify(
 			{
 				name: "ECDSA",
 				hash: { name: hash },
@@ -111,6 +110,6 @@ export const ecdsa = {
 		key: CryptoKey,
 		format: E,
 	): Promise<E extends "jwk" ? JsonWebKey : ArrayBuffer> => {
-		return (await crypto.subtle.exportKey(format, key)) as any;
+		return (await getWebcryptoSubtle().exportKey(format, key)) as any;
 	},
 };

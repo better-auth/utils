@@ -1,7 +1,7 @@
-import { subtle } from "uncrypto";
 import type { EncodingFormat, SHAFamily, TypedArray } from "./type";
 import { hex } from "./hex";
 import { base64, base64Url } from "./base64";
+import { getWebcryptoSubtle } from "./index";
 
 export const createHMAC = <E extends EncodingFormat = "none">(
 	algorithm: SHAFamily = "SHA-256",
@@ -12,7 +12,7 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			key: string | ArrayBuffer | TypedArray,
 			keyUsage: "sign" | "verify",
 		) => {
-			return subtle.importKey(
+			return getWebcryptoSubtle().importKey(
 				"raw",
 				typeof key === "string" ? new TextEncoder().encode(key) : key,
 				{ name: "HMAC", hash: { name: algorithm } },
@@ -27,7 +27,7 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			if (typeof hmacKey === "string") {
 				hmacKey = await hmac.importKey(hmacKey, "sign");
 			}
-			const signature = await subtle.sign(
+			const signature = await getWebcryptoSubtle().sign(
 				"HMAC",
 				hmacKey,
 				typeof data === "string" ? new TextEncoder().encode(data) : data,
@@ -64,7 +64,7 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			) {
 				signature = await base64.decode(signature);
 			}
-			return subtle.verify(
+			return getWebcryptoSubtle().verify(
 				"HMAC",
 				hmacKey,
 				typeof signature === "string"

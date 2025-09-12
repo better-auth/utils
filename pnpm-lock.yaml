@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      uncrypto:
-        specifier: ^0.1.3
-        version: 0.1.3
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.4
@@ -1693,9 +1689,6 @@ packages:
       typescript:
         optional: true
 
-  uncrypto@0.1.3:
-    resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
-
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
@@ -3279,8 +3272,6 @@ snapshots:
       - sass
       - supports-color
       - vue-tsc
-
-  uncrypto@0.1.3: {}
 
   undici-types@6.20.0: {}
 

@@ -1,4 +1,4 @@
-import { getRandomValues } from "uncrypto";
+import { getWebcryptoSubtle } from "./index";
 
 type Alphabet = "a-z" | "A-Z" | "0-9" | "-_";
 
@@ -52,7 +52,7 @@ export function createRandomStringGenerator<A extends Alphabet>(
 
 		while (result.length < length) {
 			if (bufIndex >= bufLength) {
-				getRandomValues(buf);
+				crypto.getRandomValues(buf);
 				bufIndex = 0;
 			}
 
