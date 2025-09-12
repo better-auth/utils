@@ -1,5 +1,3 @@
-import { getWebcryptoSubtle } from "./index";
-
 type Alphabet = "a-z" | "A-Z" | "0-9" | "-_";
 
 function expandAlphabet(alphabet: Alphabet): string {
