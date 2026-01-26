@@ -1,6 +1,6 @@
 //inspired by oslo implementation by pilcrowonpaper: https://github.com/pilcrowonpaper/oslo/blob/main/src/encoding/base32.ts
 
-import type { TypedArray } from "./type";
+import type { TypedArray, Uint8Array_ } from "./type";
 
 /**
  * Returns the Base32 alphabet based on the encoding type.
@@ -34,7 +34,7 @@ function createDecodeMap(alphabet: string): Map<string, number> {
  * @returns The Base32 encoded string.
  */
 function base32Encode(
-	data: Uint8Array,
+	data: Uint8Array_,
 	alphabet: string,
 	padding: boolean,
 ): string {
@@ -69,7 +69,7 @@ function base32Encode(
  * @param alphabet - The Base32 alphabet to use.
  * @returns The decoded Uint8Array.
  */
-function base32Decode(data: string, alphabet: string): Uint8Array {
+function base32Decode(data: string, alphabet: string): Uint8Array_ {
 	const decodeMap = createDecodeMap(alphabet);
 	const result: number[] = [];
 	let buffer = 0;
@@ -120,7 +120,7 @@ export const base32 = {
 	 * @param data - The Base32 encoded string or ArrayBuffer/TypedArray.
 	 * @returns The decoded Uint8Array.
 	 */
-	decode(data: string | ArrayBuffer | TypedArray): Uint8Array {
+	decode(data: string | ArrayBuffer | TypedArray): Uint8Array_ {
 		if (typeof data !== "string") {
 			data = new TextDecoder().decode(data);
 		}
@@ -156,7 +156,7 @@ export const base32hex = {
 	 * @param data - The Base32hex encoded string.
 	 * @returns The decoded Uint8Array.
 	 */
-	decode(data: string): Uint8Array {
+	decode(data: string): Uint8Array_ {
 		const alphabet = getAlphabet(true);
 		return base32Decode(data, alphabet);
 	},
