@@ -76,7 +76,20 @@
 		"./rsa": {
 			"import": "./dist/rsa.mjs",
 			"require": "./dist/rsa.cjs"
+		},
+		"./password": {
+			"node": {
+				"import": "./dist/password.node.mjs",
+				"require": "./dist/password.node.cjs"
+			},
+			"import": "./dist/password.mjs",
+			"require": "./dist/password.cjs"
 		}
 	},
-	"files": ["dist"]
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"@noble/hashes": "^2.0.1"
+	}
 }
