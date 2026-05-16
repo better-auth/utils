@@ -78,6 +78,10 @@
 			"require": "./dist/rsa.cjs"
 		},
 		"./password": {
+			"workerd": {
+				"import": "./dist/password.node.mjs",
+				"require": "./dist/password.node.cjs"
+			},
 			"node": {
 				"import": "./dist/password.node.mjs",
 				"require": "./dist/password.node.cjs"
