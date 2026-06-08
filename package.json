@@ -10,6 +10,7 @@
 		"test": "vitest",
 		"typecheck": "tsc --noEmit",
 		"build": "unbuild",
+		"bump": "bumpp",
 		"lint:fix": "biome check . --write"
 	},
 	"keywords": [
@@ -22,7 +23,7 @@
 	"author": "Bereket Engida",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/better-auth/utils"
+		"url": "git+https://github.com/better-auth/utils.git"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
