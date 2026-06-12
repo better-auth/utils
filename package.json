@@ -25,6 +25,10 @@
 		"type": "git",
 		"url": "git+https://github.com/better-auth/utils.git"
 	},
+	"homepage": "https://github.com/better-auth/utils#readme",
+	"bugs": {
+		"url": "https://github.com/better-auth/utils/issues"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.10.1",
