@@ -22,21 +22,23 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
+          # No git push in this job, so don't persist the token in .git/config.
+          persist-credentials: false
 
       - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version-file: '.nvmrc'
 
-      - run: npx changelogithub
+      - run: npx changelogithub@14
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          
+
       - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
 
       - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
-            node-version-file: '.nvmrc'
-            registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
 
       - run: pnpm install --frozen-lockfile
 
@@ -48,21 +50,31 @@ jobs:
         shell: bash
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
-          if [[ "$TAG" =~ -(next|canary|beta|rc) ]]; then
-            # Extract pre-release tag (e.g., beta, rc)
-            NPM_TAG=${BASH_REMATCH[1]}
+          VERSION="${TAG#v}"
+
+          # The published version must equal the tag, so a tag can't ship a
+          # different (e.g. stable) version under a pre-release dist-tag.
+          PKG_VERSION="$(node -p 'require("./package.json").version')"
+          if [ "$VERSION" != "$PKG_VERSION" ]; then
+            echo "::error ::Tag $TAG does not match package.json version $PKG_VERSION."
+            exit 1
+          fi
+
+          # Anchor to the semver pre-release identifier (e.g. 1.2.3-beta.0) so a
+          # version like 1.0.0-rchurn does not falsely match '-rc'.
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-(next|canary|beta|rc)(\.|$) ]]; then
+            # Pre-releases may be cut from any branch.
+            NPM_TAG="${BASH_REMATCH[1]}"
           else
-            # Check if the commit is on the main branch
+            # Stable (latest) releases must be cut from main.
             git fetch origin main
-            if git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
-              NPM_TAG="latest"
-            else
-              echo "The tagged commit is not on the main branch."
-              echo "::error ::Releases with the 'latest' npm tag must be on the main branch."
+            if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+              echo "::error ::Stable releases must be on the main branch."
               exit 1
             fi
+            NPM_TAG="latest"
           fi
-          echo "npm_tag=$NPM_TAG" >> $GITHUB_OUTPUT
+          echo "npm_tag=$NPM_TAG" >> "$GITHUB_OUTPUT"
           echo "Using npm tag: $NPM_TAG"
 
       - name: Publish to npm
