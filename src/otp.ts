@@ -5,6 +5,19 @@ import type { SHAFamily } from "./type";
 const defaultPeriod = 30;
 const defaultDigits = 6;
 
+/**
+ * loops over `expected.length` so timing never depends on input length
+ *
+ * @internal
+ */
+function constantTimeEqualOTP(input: string, expected: string): boolean {
+	let difference = input.length ^ expected.length;
+	for (let i = 0; i < expected.length; i++) {
+		difference |= input.charCodeAt(i) ^ expected.charCodeAt(i);
+	}
+	return difference === 0;
+}
+
 async function generateHOTP(
 	secret: string,
 	{
@@ -66,16 +79,15 @@ async function verifyTOTP(
 ) {
 	const milliseconds = period * 1000;
 	const counter = Math.floor(Date.now() / milliseconds);
+	let matched = false;
 	for (let i = -window; i <= window; i++) {
 		const generatedOTP = await generateHOTP(secret, {
 			counter: counter + i,
 			digits,
 		});
-		if (otp === generatedOTP) {
-			return true;
-		}
+		matched = constantTimeEqualOTP(otp, generatedOTP) || matched;
 	}
-	return false;
+	return matched;
 }
 
 /**

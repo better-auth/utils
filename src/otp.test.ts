@@ -88,6 +88,34 @@ describe("HOTP and TOTP Generation Tests", () => {
 		expect(isValid).toBe(false);
 	});
 
+	it("should check every TOTP window candidate without returning on first match", async () => {
+		vi.resetModules();
+		const sign = vi.fn(async () => {
+			const buffer = new ArrayBuffer(20);
+			const result = new Uint8Array(buffer);
+			result[3] = 1;
+			return buffer;
+		});
+		vi.doMock("./hmac", () => ({
+			createHMAC: () => ({
+				sign,
+			}),
+		}));
+		try {
+			const { createOTP: createMockedOTP } = await import("./otp");
+
+			const isValid = await createMockedOTP("1234567890").verify("000001", {
+				window: 1,
+			});
+
+			expect(isValid).toBe(true);
+			expect(sign).toHaveBeenCalledTimes(3);
+		} finally {
+			vi.doUnmock("./hmac");
+			vi.resetModules();
+		}
+	});
+
 	it("should generate a valid QR code URL", () => {
 		const secret = "1234567890";
 		const issuer = "my-site.com";
