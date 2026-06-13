@@ -5,6 +5,29 @@ import type { SHAFamily } from "./type";
 const defaultPeriod = 30;
 const defaultDigits = 6;
 
+/**
+ * Compares two strings in constant time relative to the length of `b`.
+ *
+ * Unlike `===`, this does not short-circuit on the first differing byte, so
+ * the comparison time does not leak the length of the matching prefix. This
+ * matters because one operand is a secret OTP derived from the shared secret
+ * and the other is attacker-controlled.
+ */
+export function constantTimeEqual(a: string, b: string) {
+	const aBytes = new TextEncoder().encode(a);
+	const bBytes = new TextEncoder().encode(b);
+	// Fold the length difference into the accumulator so a mismatched length
+	// can never produce a `0` result, while still iterating over every byte.
+	let result = aBytes.length ^ bBytes.length;
+	for (let i = 0; i < bBytes.length; i++) {
+		// `aBytes[i]` reads `undefined` past the end of `a`; `undefined ^ x`
+		// coerces to `0 ^ x = x`, so a length mismatch is still recorded by
+		// the accumulator above without an early return.
+		result |= (aBytes[i] as number) ^ bBytes[i];
+	}
+	return result === 0;
+}
+
 async function generateHOTP(
 	secret: string,
 	{
@@ -66,16 +89,17 @@ async function verifyTOTP(
 ) {
 	const milliseconds = period * 1000;
 	const counter = Math.floor(Date.now() / milliseconds);
+	let valid = false;
 	for (let i = -window; i <= window; i++) {
 		const generatedOTP = await generateHOTP(secret, {
 			counter: counter + i,
 			digits,
 		});
-		if (otp === generatedOTP) {
-			return true;
-		}
+		// Compare in constant time and avoid an early return so neither the
+		// matching-prefix length nor which window candidate matched is leaked.
+		valid = constantTimeEqual(otp, generatedOTP) || valid;
 	}
-	return false;
+	return valid;
 }
 
 /**
