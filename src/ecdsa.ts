@@ -4,6 +4,7 @@ import type {
 	SHAFamily,
 	TypedArray,
 } from "./type";
+import { toBufferSource } from "./bytes";
 import { getWebcryptoSubtle } from "./index";
 
 export const ecdsa = {
@@ -26,12 +27,9 @@ export const ecdsa = {
 		curve: ECDSACurve,
 		extractable = false,
 	): Promise<CryptoKey> => {
-		if (typeof privateKey === "string") {
-			privateKey = new TextEncoder().encode(privateKey);
-		}
 		return await getWebcryptoSubtle().importKey(
 			"pkcs8",
-			privateKey,
+			toBufferSource(privateKey),
 			{
 				name: "ECDSA",
 				namedCurve: curve,
@@ -45,12 +43,9 @@ export const ecdsa = {
 		curve: ECDSACurve,
 		extractable = false,
 	): Promise<CryptoKey> => {
-		if (typeof publicKey === "string") {
-			publicKey = new TextEncoder().encode(publicKey);
-		}
 		return await getWebcryptoSubtle().importKey(
 			"spki",
-			publicKey,
+			toBufferSource(publicKey),
 			{
 				name: "ECDSA",
 				namedCurve: curve,
@@ -64,16 +59,13 @@ export const ecdsa = {
 		data: ArrayBuffer | TypedArray | string,
 		hash: SHAFamily = "SHA-256",
 	): Promise<ArrayBuffer> => {
-		if (typeof data === "string") {
-			data = new TextEncoder().encode(data);
-		}
 		const signature = await getWebcryptoSubtle().sign(
 			{
 				name: "ECDSA",
 				hash: { name: hash },
 			},
 			privateKey,
-			data,
+			toBufferSource(data),
 		);
 		return signature;
 	},
@@ -90,26 +82,23 @@ export const ecdsa = {
 			hash?: SHAFamily;
 		},
 	): Promise<boolean> => {
-		if (typeof signature === "string") {
-			signature = new TextEncoder().encode(signature);
-		}
-		if (typeof data === "string") {
-			data = new TextEncoder().encode(data);
-		}
 		return await getWebcryptoSubtle().verify(
 			{
 				name: "ECDSA",
 				hash: { name: hash },
 			},
 			publicKey,
-			signature,
-			data,
+			toBufferSource(signature),
+			toBufferSource(data),
 		);
 	},
 	exportKey: async <E extends ExportKeyFormat>(
 		key: CryptoKey,
 		format: E,
 	): Promise<E extends "jwk" ? JsonWebKey : ArrayBuffer> => {
-		return (await getWebcryptoSubtle().exportKey(format, key)) as any;
+		return (await getWebcryptoSubtle().exportKey(
+			format,
+			key,
+		)) as E extends "jwk" ? JsonWebKey : ArrayBuffer;
 	},
 };

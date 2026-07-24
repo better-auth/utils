@@ -1,6 +1,7 @@
 //inspired by oslo implementation by pilcrowonpaper: https://github.com/pilcrowonpaper/oslo/blob/main/src/encoding/base32.ts
 
 import type { TypedArray, Uint8Array_ } from "./type";
+import { toUint8Array } from "./bytes";
 
 /**
  * Returns the Base32 alphabet based on the encoding type.
@@ -108,10 +109,7 @@ export const base32 = {
 		options: { padding?: boolean } = {},
 	): string {
 		const alphabet = getAlphabet(false);
-		const buffer =
-			typeof data === "string"
-				? new TextEncoder().encode(data)
-				: new Uint8Array(data);
+		const buffer = toUint8Array(data);
 		return base32Encode(buffer, alphabet, options.padding ?? true);
 	},
 
@@ -144,10 +142,7 @@ export const base32hex = {
 		options: { padding?: boolean } = {},
 	): string {
 		const alphabet = getAlphabet(true);
-		const buffer =
-			typeof data === "string"
-				? new TextEncoder().encode(data)
-				: new Uint8Array(data);
+		const buffer = toUint8Array(data);
 		return base32Encode(buffer, alphabet, options.padding ?? true);
 	},
 
