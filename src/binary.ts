@@ -1,3 +1,5 @@
+import type { Uint8Array_ } from "./type";
+
 type Encoding = "utf-8" | "utf-16" | "iso-8859-1";
 
 type BinaryData = ArrayBuffer | ArrayBufferView;
@@ -13,5 +15,5 @@ export const binary = {
 		const decoder = decoders.get(encoding)!;
 		return decoder.decode(data);
 	},
-	encode: encoder.encode,
+	encode: (input?: string): Uint8Array_ => encoder.encode(input),
 };
