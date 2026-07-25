@@ -8,7 +8,10 @@ const config = {
 	dkLen: 64,
 };
 
-async function generateKey(password: string, salt: string): Promise<Uint8Array> {
+async function generateKey(
+	password: string,
+	salt: string,
+): Promise<Uint8Array> {
 	return scryptAsync(password.normalize("NFKC"), salt, {
 		N: config.N,
 		r: config.r,
