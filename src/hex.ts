@@ -1,11 +1,11 @@
 import { hexToBytes } from "@noble/hashes/utils.js";
-import type { TypedArray, Uint8Array_ } from "./type";
 import { toUint8Array } from "./bytes";
+import type { NumberTypedArray, TypedArray, Uint8Array_ } from "./type";
 
 const toBytes = (data: string): Uint8Array_ => hexToBytes(data) as Uint8Array_;
 
 export const hex = {
-	encode: (data: string | ArrayBuffer | TypedArray) => {
+	encode: (data: string | ArrayBuffer | NumberTypedArray) => {
 		const buffer = toUint8Array(data);
 		if (buffer.byteLength === 0) {
 			return "";

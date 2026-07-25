@@ -1,14 +1,15 @@
-export type TypedArray =
+export type NumberTypedArray =
 	| Uint8Array
+	| Uint8ClampedArray
 	| Int8Array
 	| Uint16Array
 	| Int16Array
 	| Uint32Array
 	| Int32Array
 	| Float32Array
-	| Float64Array
-	| BigInt64Array
-	| BigUint64Array;
+	| Float64Array;
+
+export type TypedArray = NumberTypedArray | BigInt64Array | BigUint64Array;
 
 /**
  * Equivalent to `Uint8Array` before TypeScript 5.7, and `Uint8Array<ArrayBuffer>` in TypeScript 5.7
