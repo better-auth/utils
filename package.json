@@ -7,7 +7,7 @@
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",
 	"scripts": {
-		"prepare": "git rev-parse --git-dir >/dev/null 2>&1 && lefthook install --reset-hooks-path || echo \"skipping lefthook (not a git repo)\"",
+		"prepare": "if git rev-parse --git-dir >/dev/null 2>&1; then lefthook install --reset-hooks-path; else echo \"skipping lefthook (not a git repo)\"; fi",
 		"test": "vitest",
 		"typecheck": "tsc --noEmit",
 		"build": "tsdown",
