@@ -1,4 +1,5 @@
 import { getWebcryptoSubtle } from "./index";
+import { toBufferSource } from "./bytes";
 
 type ExportFormat = "jwk" | "spki" | "pkcs8";
 
@@ -22,7 +23,10 @@ export const rsa = {
 		key: CryptoKey,
 		format: E,
 	): Promise<E extends "jwk" ? JsonWebKey : ArrayBuffer> => {
-		return (await getWebcryptoSubtle().exportKey(format, key)) as any;
+		return (await getWebcryptoSubtle().exportKey(
+			format,
+			key,
+		)) as E extends "jwk" ? JsonWebKey : ArrayBuffer;
 	},
 	importKey: async (
 		key: JsonWebKey,
@@ -44,31 +48,31 @@ export const rsa = {
 		key: CryptoKey,
 		data: string | ArrayBuffer | ArrayBufferView,
 	) => {
-		const encodedData =
-			typeof data === "string" ? new TextEncoder().encode(data) : data;
 		return await getWebcryptoSubtle().encrypt(
 			{ name: "RSA-OAEP" },
 			key,
-			encodedData,
+			toBufferSource(data),
 		);
 	},
 	decrypt: async (key: CryptoKey, data: ArrayBuffer | ArrayBufferView) => {
-		return await getWebcryptoSubtle().decrypt({ name: "RSA-OAEP" }, key, data);
+		return await getWebcryptoSubtle().decrypt(
+			{ name: "RSA-OAEP" },
+			key,
+			toBufferSource(data),
+		);
 	},
 	sign: async (
 		key: CryptoKey,
 		data: string | ArrayBuffer | ArrayBufferView,
 		saltLength = 32,
 	) => {
-		const encodedData =
-			typeof data === "string" ? new TextEncoder().encode(data) : data;
 		return await getWebcryptoSubtle().sign(
 			{
 				name: "RSA-PSS",
 				saltLength,
 			},
 			key,
-			encodedData,
+			toBufferSource(data),
 		);
 	},
 	verify: async (
@@ -83,19 +87,14 @@ export const rsa = {
 			saltLength?: number;
 		},
 	) => {
-		if (typeof signature === "string") {
-			signature = new TextEncoder().encode(signature);
-		}
-		const encodedData =
-			typeof data === "string" ? new TextEncoder().encode(data) : data;
 		return await getWebcryptoSubtle().verify(
 			{
 				name: "RSA-PSS",
 				saltLength,
 			},
 			key,
-			signature,
-			encodedData,
+			toBufferSource(signature),
+			toBufferSource(data),
 		);
 	},
 };

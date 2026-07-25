@@ -1,6 +1,7 @@
 //inspired by oslo implementation by pilcrowonpaper: https://github.com/pilcrowonpaper/oslo/blob/main/src/encoding/base64.ts
 
 import type { TypedArray, Uint8Array_ } from "./type";
+import { toUint8Array } from "./bytes";
 
 function getAlphabet(urlSafe: boolean): string {
 	return urlSafe
@@ -71,10 +72,7 @@ export const base64 = {
 		options: { padding?: boolean } = {},
 	) {
 		const alphabet = getAlphabet(false);
-		const buffer =
-			typeof data === "string"
-				? new TextEncoder().encode(data)
-				: new Uint8Array(data);
+		const buffer = toUint8Array(data);
 		return base64Encode(buffer, alphabet, options.padding ?? true);
 	},
 	decode(data: string | ArrayBuffer | TypedArray) {
@@ -93,10 +91,7 @@ export const base64Url = {
 		options: { padding?: boolean } = {},
 	) {
 		const alphabet = getAlphabet(true);
-		const buffer =
-			typeof data === "string"
-				? new TextEncoder().encode(data)
-				: new Uint8Array(data);
+		const buffer = toUint8Array(data);
 		return base64Encode(buffer, alphabet, options.padding ?? true);
 	},
 	decode(data: string) {

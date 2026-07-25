@@ -1,15 +1,13 @@
 import type { TypedArray } from "./type";
+import { toUint8Array } from "./bytes";
 
 const hexadecimal = "0123456789abcdef";
 export const hex = {
 	encode: (data: string | ArrayBuffer | TypedArray) => {
-		if (typeof data === "string") {
-			data = new TextEncoder().encode(data);
-		}
-		if (data.byteLength === 0) {
+		const buffer = toUint8Array(data);
+		if (buffer.byteLength === 0) {
 			return "";
 		}
-		const buffer = new Uint8Array(data);
 		let result = "";
 		for (const byte of buffer) {
 			result += byte.toString(16).padStart(2, "0");

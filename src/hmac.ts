@@ -1,4 +1,5 @@
 import type { EncodingFormat, SHAFamily, TypedArray } from "./type";
+import { toBufferSource } from "./bytes";
 import { hex } from "./hex";
 import { base64, base64Url } from "./base64";
 import { getWebcryptoSubtle } from "./index";
@@ -14,7 +15,7 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 		) => {
 			return getWebcryptoSubtle().importKey(
 				"raw",
-				typeof key === "string" ? new TextEncoder().encode(key) : key,
+				toBufferSource(key),
 				{ name: "HMAC", hash: { name: algorithm } },
 				false,
 				[keyUsage],
@@ -30,10 +31,10 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			const signature = await getWebcryptoSubtle().sign(
 				"HMAC",
 				hmacKey,
-				typeof data === "string" ? new TextEncoder().encode(data) : data,
+				toBufferSource(data),
 			);
 			if (encoding === "hex") {
-				return hex.encode(signature) as any;
+				return hex.encode(signature) as E extends "none" ? ArrayBuffer : string;
 			}
 			if (
 				encoding === "base64" ||
@@ -42,9 +43,9 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			) {
 				return base64Url.encode(signature, {
 					padding: encoding !== "base64urlnopad",
-				}) as any;
+				}) as E extends "none" ? ArrayBuffer : string;
 			}
-			return signature as any;
+			return signature as E extends "none" ? ArrayBuffer : string;
 		},
 		verify: async (
 			hmacKey: CryptoKey | string,
@@ -67,10 +68,8 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			return getWebcryptoSubtle().verify(
 				"HMAC",
 				hmacKey,
-				typeof signature === "string"
-					? new TextEncoder().encode(signature)
-					: signature,
-				typeof data === "string" ? new TextEncoder().encode(data) : data,
+				toBufferSource(signature),
+				toBufferSource(data),
 			);
 		},
 	};

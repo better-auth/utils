@@ -1,4 +1,5 @@
 import { base64, base64Url } from "./base64";
+import { toBufferSource } from "./bytes";
 import type { EncodingFormat, SHAFamily, TypedArray } from "./type";
 import { getWebcryptoSubtle } from "./index";
 
@@ -10,8 +11,7 @@ export function createHash<Encoding extends EncodingFormat = "none">(
 		digest: async (
 			input: string | ArrayBuffer | TypedArray,
 		): Promise<Encoding extends "none" ? ArrayBuffer : string> => {
-			const encoder = new TextEncoder();
-			const data = typeof input === "string" ? encoder.encode(input) : input;
+			const data = toBufferSource(input);
 			const hashBuffer = await getWebcryptoSubtle().digest(algorithm, data);
 
 			if (encoding === "hex") {
@@ -19,7 +19,7 @@ export function createHash<Encoding extends EncodingFormat = "none">(
 				const hashHex = hashArray
 					.map((b) => b.toString(16).padStart(2, "0"))
 					.join("");
-				return hashHex as any;
+				return hashHex as Encoding extends "none" ? ArrayBuffer : string;
 			}
 
 			if (
@@ -30,12 +30,12 @@ export function createHash<Encoding extends EncodingFormat = "none">(
 				if (encoding.includes("url")) {
 					return base64Url.encode(hashBuffer, {
 						padding: encoding !== "base64urlnopad",
-					}) as any;
+					}) as Encoding extends "none" ? ArrayBuffer : string;
 				}
 				const hashBase64 = base64.encode(hashBuffer);
-				return hashBase64 as any;
+				return hashBase64 as Encoding extends "none" ? ArrayBuffer : string;
 			}
-			return hashBuffer as any;
+			return hashBuffer as Encoding extends "none" ? ArrayBuffer : string;
 		},
 	};
 }

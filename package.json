@@ -9,7 +9,7 @@
 	"scripts": {
 		"test": "vitest",
 		"typecheck": "tsc --noEmit",
-		"build": "unbuild",
+		"build": "tsdown",
 		"bump": "bumpp",
 		"lint:fix": "biome check . --write"
 	},
@@ -30,8 +30,8 @@
 		"@types/node": "^22.10.1",
 		"bumpp": "^9.9.0",
 		"happy-dom": "^15.11.7",
-		"typescript": "^5.8.2",
-		"unbuild": "^2.0.0",
+		"tsdown": "0.22.9",
+		"typescript": "^6.0.3",
 		"vitest": "^2.1.8"
 	},
 	"exports": {
