@@ -1,9 +1,9 @@
-import type { TypedArray } from "./type";
+import type { NumberTypedArray, TypedArray } from "./type";
 import { toUint8Array } from "./bytes";
 
 const hexadecimal = "0123456789abcdef";
 export const hex = {
-	encode: (data: string | ArrayBuffer | TypedArray) => {
+	encode: (data: string | ArrayBuffer | NumberTypedArray) => {
 		const buffer = toUint8Array(data);
 		if (buffer.byteLength === 0) {
 			return "";

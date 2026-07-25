@@ -1,4 +1,4 @@
-import type { TypedArray, Uint8Array_ } from "./type";
+import type { NumberTypedArray, Uint8Array_ } from "./type";
 
 export function toBufferSource(
 	data: string | ArrayBuffer | ArrayBufferView,
@@ -18,14 +18,14 @@ export function toBufferSource(
 /**
  * Converts strings and binary data into a `Uint8Array`.
  *
- * `ArrayBuffer` inputs share memory with the returned view, while `TypedArray`
- * inputs are copied according to native constructor semantics.
+ * `ArrayBuffer` inputs share memory with the returned view, while number-based
+ * `TypedArray` inputs are copied according to native constructor semantics.
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#buffer | ArrayBuffer constructor behavior}
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#typedarray | TypedArray constructor behavior}
  */
 export function toUint8Array(
-	data: string | ArrayBuffer | TypedArray,
+	data: string | ArrayBuffer | NumberTypedArray,
 ): Uint8Array_ {
 	if (typeof data === "string") {
 		return new TextEncoder().encode(data);

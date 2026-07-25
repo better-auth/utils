@@ -302,7 +302,7 @@ Base64 utilities provide a simple interface to encode and decode data in base64 
 
 ### Encoding
 
-Encode data in base64 format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
+Encode data in base64 format. Input can be a string, `ArrayBuffer`, or number-based `TypedArray`. BigInt typed arrays are not supported.
 
 ```ts
 import { base64 } from "@better-auth/utils/base64";
@@ -343,7 +343,7 @@ Hex utilities provide a simple interface to encode and decode data in hexadecima
 
 ### Encoding
 
-Encode data in hexadecimal format. Input can be a string, `ArrayBuffer`, or `TypedArray`.
+Encode data in hexadecimal format. Input can be a string, `ArrayBuffer`, or number-based `TypedArray`. BigInt typed arrays are not supported.
 
 ```ts
 import { hex } from "@better-auth/utils/hex";

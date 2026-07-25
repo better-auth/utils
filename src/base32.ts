@@ -1,6 +1,6 @@
 //inspired by oslo implementation by pilcrowonpaper: https://github.com/pilcrowonpaper/oslo/blob/main/src/encoding/base32.ts
 
-import type { TypedArray, Uint8Array_ } from "./type";
+import type { NumberTypedArray, TypedArray, Uint8Array_ } from "./type";
 import { toUint8Array } from "./bytes";
 
 /**
@@ -100,12 +100,12 @@ function base32Decode(data: string, alphabet: string): Uint8Array_ {
 export const base32 = {
 	/**
 	 * Encodes data into a Base32 string.
-	 * @param data - The data to encode (ArrayBuffer, TypedArray, or string).
+	 * @param data - The data to encode (ArrayBuffer, number-based TypedArray, or string).
 	 * @param options - Encoding options.
 	 * @returns The Base32 encoded string.
 	 */
 	encode(
-		data: ArrayBuffer | TypedArray | string,
+		data: ArrayBuffer | NumberTypedArray | string,
 		options: { padding?: boolean } = {},
 	): string {
 		const alphabet = getAlphabet(false);
@@ -133,12 +133,12 @@ export const base32 = {
 export const base32hex = {
 	/**
 	 * Encodes data into a Base32hex string.
-	 * @param data - The data to encode (ArrayBuffer, TypedArray, or string).
+	 * @param data - The data to encode (ArrayBuffer, number-based TypedArray, or string).
 	 * @param options - Encoding options.
 	 * @returns The Base32hex encoded string.
 	 */
 	encode(
-		data: ArrayBuffer | TypedArray | string,
+		data: ArrayBuffer | NumberTypedArray | string,
 		options: { padding?: boolean } = {},
 	): string {
 		const alphabet = getAlphabet(true);
