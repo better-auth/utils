@@ -19,6 +19,29 @@ describe("hex", () => {
 		});
 	});
 
+	describe("toBytes", () => {
+		it("should convert hexadecimal to bytes", () => {
+			expect(hex.toBytes("48656c6c6f")).toEqual(
+				Uint8Array.from([72, 101, 108, 108, 111]),
+			);
+		});
+
+		it("should accept uppercase hexadecimal", () => {
+			expect(hex.toBytes("DEADBEEF")).toEqual(
+				Uint8Array.from([222, 173, 190, 239]),
+			);
+		});
+
+		it("should convert an empty string to empty bytes", () => {
+			expect(hex.toBytes("")).toEqual(new Uint8Array());
+		});
+
+		it("should throw an error for invalid hexadecimal", () => {
+			expect(() => hex.toBytes("123")).toThrow(Error);
+			expect(() => hex.toBytes("zzzz")).toThrow(Error);
+		});
+	});
+
 	describe("decode", () => {
 		it("should decode a hexadecimal string to its original value", () => {
 			const expected = "Hello, World!";
@@ -28,6 +51,10 @@ describe("hex", () => {
 		it("should handle decoding of a hexadecimal string to binary data", () => {
 			const expected = "Hello";
 			expect(hex.decode(Buffer.from(expected).toString("hex"))).toBe(expected);
+		});
+
+		it("should decode uppercase hexadecimal", () => {
+			expect(hex.decode("48656C6C6F")).toBe("Hello");
 		});
 
 		it("should throw an error for an odd-length string", () => {

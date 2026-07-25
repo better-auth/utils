@@ -1,7 +1,9 @@
-import type { TypedArray } from "./type";
+import { hexToBytes } from "@noble/hashes/utils.js";
+import type { TypedArray, Uint8Array_ } from "./type";
 import { toUint8Array } from "./bytes";
 
-const hexadecimal = "0123456789abcdef";
+const toBytes = (data: string): Uint8Array_ => hexToBytes(data) as Uint8Array_;
+
 export const hex = {
 	encode: (data: string | ArrayBuffer | TypedArray) => {
 		const buffer = toUint8Array(data);
@@ -19,18 +21,9 @@ export const hex = {
 			return "";
 		}
 		if (typeof data === "string") {
-			if (data.length % 2 !== 0) {
-				throw new Error("Invalid hexadecimal string");
-			}
-			if (!new RegExp(`^[${hexadecimal}]+$`).test(data)) {
-				throw new Error("Invalid hexadecimal string");
-			}
-			const result = new Uint8Array(data.length / 2);
-			for (let i = 0; i < data.length; i += 2) {
-				result[i / 2] = parseInt(data.slice(i, i + 2), 16);
-			}
-			return new TextDecoder().decode(result);
+			return new TextDecoder().decode(toBytes(data));
 		}
 		return new TextDecoder().decode(data);
 	},
+	toBytes,
 };
