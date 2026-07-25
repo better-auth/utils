@@ -353,10 +353,18 @@ const encodedData = hex.encode("Data to encode");
 
 ### Decoding
 
-Decode hexadecimal-encoded data. Input can be a string or `ArrayBuffer`.
+Decode hexadecimal-encoded data into a string. Input can be a string, `ArrayBuffer`, or `TypedArray`. Uppercase and lowercase hexadecimal are both accepted.
 
 ```ts
 const decodedData = hex.decode(encodedData);
+```
+
+### Converting to bytes
+
+Convert a hexadecimal string into its raw bytes. Use this when the decoded value is binary data, such as a signature or key, rather than UTF-8 text.
+
+```ts
+const bytes = hex.toBytes("48656c6c6f"); // Uint8Array([72, 101, 108, 108, 111])
 ```
 
 ## Binary

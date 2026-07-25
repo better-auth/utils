@@ -36,11 +36,12 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 			if (encoding === "hex") {
 				return hex.encode(signature) as E extends "none" ? ArrayBuffer : string;
 			}
-			if (
-				encoding === "base64" ||
-				encoding === "base64url" ||
-				encoding === "base64urlnopad"
-			) {
+			if (encoding === "base64") {
+				return base64.encode(signature) as E extends "none"
+					? ArrayBuffer
+					: string;
+			}
+			if (encoding === "base64url" || encoding === "base64urlnopad") {
 				return base64Url.encode(signature, {
 					padding: encoding !== "base64urlnopad",
 				}) as E extends "none" ? ArrayBuffer : string;
@@ -56,7 +57,8 @@ export const createHMAC = <E extends EncodingFormat = "none">(
 				hmacKey = await hmac.importKey(hmacKey, "verify");
 			}
 			if (encoding === "hex") {
-				signature = hex.decode(signature);
+				signature =
+					typeof signature === "string" ? hex.toBytes(signature) : signature;
 			}
 			if (
 				encoding === "base64" ||
