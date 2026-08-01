@@ -6,6 +6,61 @@ const defaultPeriod = 30;
 const defaultDigits = 6;
 
 /**
+ * The secret used to derive the HMAC key for HOTP/TOTP.
+ *
+ * - `string`: encoded as UTF-8 bytes (default, backwards compatible).
+ * - `ArrayBuffer` / `Uint8Array`: used directly as the raw HMAC key bytes. This matches
+ *   the RFC 4226 / RFC 6238 convention used by most authenticator libraries, where the
+ *   secret is raw bytes and base32 is only the transport encoding. Decode the base32
+ *   secret once and pass the bytes here so secrets migrated from those libraries verify
+ *   correctly.
+ * - `CryptoKey`: an already-imported HMAC key, used as-is. Its algorithm must match the
+ *   OTP hash (SHA-1), otherwise the generated code silently differs. A `CryptoKey` has no
+ *   extractable bytes, so it cannot be used with `url()`.
+ */
+export type OTPSecret = string | ArrayBuffer | Uint8Array | CryptoKey;
+
+/**
+ * Normalises any byte source to a `Uint8Array` over its EXACT underlying bytes.
+ *
+ * Both the HMAC key derivation and the base32 transport (QR URL) must read the same
+ * bytes. A `TypedArray` whose elements are wider than one byte (e.g. `Uint16Array`) is
+ * structurally assignable to `Uint8Array` in TypeScript, so the type alone can't keep it
+ * out — and the two paths would otherwise disagree (raw buffer bytes vs element-wise
+ * truncation), silently locking the user out. Going through the underlying buffer makes
+ * both paths agree for every view, including `subarray` views with a non-zero offset.
+ */
+function toBytes(secret: ArrayBuffer | ArrayBufferView): Uint8Array {
+	return secret instanceof ArrayBuffer
+		? new Uint8Array(secret)
+		: new Uint8Array(secret.buffer, secret.byteOffset, secret.byteLength);
+}
+
+/**
+ * Resolves an {@link OTPSecret} into a value that `createHMAC().sign` accepts.
+ *
+ * A `string` is passed through so `sign` encodes it as UTF-8 (unchanged behaviour).
+ * Raw bytes are imported as the HMAC key directly — crucially WITHOUT going through
+ * `TextEncoder`, which would expand any byte >= 0x80 into a 2-byte UTF-8 sequence and
+ * produce the wrong key. A `CryptoKey` is returned untouched.
+ *
+ * Bytes are detected with `ArrayBuffer.isView` rather than `instanceof CryptoKey`, so this
+ * never dereferences the `CryptoKey` global (which is not bound in every runtime).
+ */
+async function resolveHmacKey(
+	secret: OTPSecret,
+	hash: SHAFamily,
+): Promise<string | CryptoKey> {
+	if (typeof secret === "string") {
+		return secret;
+	}
+	if (secret instanceof ArrayBuffer || ArrayBuffer.isView(secret)) {
+		return createHMAC(hash).importKey(toBytes(secret), "sign");
+	}
+	return secret;
+}
+
+/**
  * loops over `expected.length` so timing never depends on input length
  *
  * @internal
@@ -19,7 +74,7 @@ function constantTimeEqualOTP(input: string, expected: string): boolean {
 }
 
 async function generateHOTP(
-	secret: string,
+	secret: OTPSecret,
 	{
 		counter,
 		digits,
@@ -37,7 +92,8 @@ async function generateHOTP(
 	const buffer = new ArrayBuffer(8);
 	new DataView(buffer).setBigUint64(0, BigInt(counter), false);
 	const bytes = new Uint8Array(buffer);
-	const hmacResult = new Uint8Array(await createHMAC(hash).sign(secret, bytes));
+	const key = await resolveHmacKey(secret, hash);
+	const hmacResult = new Uint8Array(await createHMAC(hash).sign(key, bytes));
 	const offset = hmacResult[hmacResult.length - 1] & 0x0f;
 	const truncated =
 		((hmacResult[offset] & 0x7f) << 24) |
@@ -49,7 +105,7 @@ async function generateHOTP(
 }
 
 async function generateTOTP(
-	secret: string,
+	secret: OTPSecret,
 	options?: {
 		period?: number;
 		digits?: number;
@@ -74,7 +130,7 @@ async function verifyTOTP(
 		period?: number;
 		window?: number;
 		digits?: number;
-		secret: string;
+		secret: OTPSecret;
 	},
 ) {
 	const milliseconds = period * 1000;
@@ -102,17 +158,29 @@ function generateQRCode({
 }: {
 	issuer: string;
 	account: string;
-	secret: string;
+	secret: OTPSecret;
 	digits?: number;
 	period?: number;
 }) {
+	if (
+		typeof secret !== "string" &&
+		!(secret instanceof ArrayBuffer) &&
+		!ArrayBuffer.isView(secret)
+	) {
+		throw new TypeError(
+			"Cannot build an otpauth:// URL from a CryptoKey secret; pass the raw secret bytes or a string instead.",
+		);
+	}
 	const encodedIssuer = encodeURIComponent(issuer);
 	const encodedAccountName = encodeURIComponent(account);
 	const baseURI = `otpauth://totp/${encodedIssuer}:${encodedAccountName}`;
 	const params = new URLSearchParams({
-		secret: base32.encode(secret, {
-			padding: false,
-		}),
+		secret: base32.encode(
+			typeof secret === "string" ? secret : toBytes(secret),
+			{
+				padding: false,
+			},
+		),
 		issuer,
 	});
 
@@ -126,7 +194,7 @@ function generateQRCode({
 }
 
 export const createOTP = (
-	secret: string,
+	secret: OTPSecret,
 	opts?: {
 		digits?: number;
 		period?: number;
