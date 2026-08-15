@@ -93,7 +93,7 @@
 			"require": "./dist/password.cjs"
 		}
 	},
-	"files": ["dist"],
+	"files": ["dist", "LICENSE"],
 	"dependencies": {
 		"@noble/hashes": "^2.0.1"
 	}
