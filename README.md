@@ -296,6 +296,20 @@ const qrCodeUrl = createOTP(secret).url("my-app", "user@email.com");
 ```
 
 
+### Using a raw-byte secret (RFC 6238 migration)
+
+`createOTP` also accepts the secret as raw bytes (`Uint8Array` / `ArrayBuffer`) or a `CryptoKey`, not just a string. Most authenticator libraries (and `otpauth://` URIs) treat the secret as **raw bytes**, with base32 only as the transport encoding. To verify or generate codes for a secret created by such a library, decode the base32 once and pass the bytes:
+
+```ts
+import { createOTP } from "@better-auth/utils/otp";
+import { base32 } from "@better-auth/utils/base32";
+
+// `otpSecret` is the base32 string from the other library / otpauth:// URI
+const isValid = createOTP(base32.decode(otpSecret)).verify(code);
+```
+
+Passing a `string` keeps the previous behaviour (it is encoded as UTF-8 before the key is derived).
+
 ## Base64
 
 Base64 utilities provide a simple interface to encode and decode data in base64 format.
