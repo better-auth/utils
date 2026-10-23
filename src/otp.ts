@@ -19,7 +19,7 @@ function constantTimeEqualOTP(input: string, expected: string): boolean {
 }
 
 async function generateHOTP(
-	secret: string,
+	secret: string | Uint8Array,
 	{
 		counter,
 		digits,
@@ -37,7 +37,10 @@ async function generateHOTP(
 	const buffer = new ArrayBuffer(8);
 	new DataView(buffer).setBigUint64(0, BigInt(counter), false);
 	const bytes = new Uint8Array(buffer);
-	const hmacResult = new Uint8Array(await createHMAC(hash).sign(secret, bytes));
+	const hmac = createHMAC(hash);
+	const key =
+		typeof secret === "string" ? secret : await hmac.importKey(secret, "sign");
+	const hmacResult = new Uint8Array(await hmac.sign(key, bytes));
 	const offset = hmacResult[hmacResult.length - 1] & 0x0f;
 	const truncated =
 		((hmacResult[offset] & 0x7f) << 24) |
@@ -49,7 +52,7 @@ async function generateHOTP(
 }
 
 async function generateTOTP(
-	secret: string,
+	secret: string | Uint8Array,
 	options?: {
 		period?: number;
 		digits?: number;
@@ -74,7 +77,7 @@ async function verifyTOTP(
 		period?: number;
 		window?: number;
 		digits?: number;
-		secret: string;
+		secret: string | Uint8Array;
 	},
 ) {
 	const milliseconds = period * 1000;
@@ -102,7 +105,7 @@ function generateQRCode({
 }: {
 	issuer: string;
 	account: string;
-	secret: string;
+	secret: string | Uint8Array;
 	digits?: number;
 	period?: number;
 }) {
@@ -125,21 +128,31 @@ function generateQRCode({
 	return `${baseURI}?${params.toString()}`;
 }
 
+/**
+ * String secrets are encoded as UTF-8; byte inputs are used directly.
+ * Decode Base32 secrets before passing them to this function.
+ */
 export const createOTP = (
-	secret: string,
+	secret: string | Uint8Array | ArrayBuffer,
 	opts?: {
 		digits?: number;
 		period?: number;
 	},
 ) => {
+	const key =
+		typeof secret === "string"
+			? secret
+			: ArrayBuffer.isView(secret)
+				? new Uint8Array(secret.buffer, secret.byteOffset, secret.byteLength)
+				: new Uint8Array(secret);
 	const digits = opts?.digits ?? defaultDigits;
 	const period = opts?.period ?? defaultPeriod;
 	return {
-		hotp: (counter: number) => generateHOTP(secret, { counter, digits }),
-		totp: () => generateTOTP(secret, { digits, period }),
+		hotp: (counter: number) => generateHOTP(key, { counter, digits }),
+		totp: () => generateTOTP(key, { digits, period }),
 		verify: (otp: string, options?: { window?: number }) =>
-			verifyTOTP(otp, { secret, digits, period, ...options }),
+			verifyTOTP(otp, { secret: key, digits, period, ...options }),
 		url: (issuer: string, account: string) =>
-			generateQRCode({ issuer, account, secret, digits, period }),
+			generateQRCode({ issuer, account, secret: key, digits, period }),
 	};
 };

@@ -235,6 +235,18 @@ The OTP utility provides a simple and secure way to generate and verify one-time
 
 It's implemented based on [RFC 4226](https://tools.ietf.org/html/rfc4226) and [RFC 6238](https://tools.ietf.org/html/rfc6238).
 
+`createOTP` accepts a string, `Uint8Array`, or `ArrayBuffer` as the secret. Strings are encoded as UTF-8. If you have a Base32 secret, decode it first:
+
+```ts
+import { base32 } from "@better-auth/utils/base32";
+import { createOTP } from "@better-auth/utils/otp";
+
+const otp = createOTP(base32.decode("JBSWY3DPEHPK3PXP"));
+const code = await otp.totp();
+const isValid = await otp.verify(code);
+const qrCodeUrl = otp.url("my-app", "user@example.com");
+```
+
 ### Generating HOTP
 
 HOTP generates a one-time password based on a counter value and a secret key. The counter should be incremented for each new OTP.
