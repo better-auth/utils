@@ -304,7 +304,7 @@ import { base32 } from "@better-auth/utils/base32";
 import { createOTP } from "@better-auth/utils/otp";
 
 const secret = base32.decode("JBSWY3DPEHPK3PXP");
-const isValid = createOTP(secret).verify(otp);
+const isValid = await createOTP(secret).verify(otp);
 ```
 
 
