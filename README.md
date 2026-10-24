@@ -295,6 +295,18 @@ const secret = "my-super-secret-key";
 const qrCodeUrl = createOTP(secret).url("my-app", "user@email.com"); 
 ```
 
+### Using a Byte Secret
+
+`createOTP` also accepts a `Uint8Array` or `ArrayBuffer` as the HMAC key. Strings are used as UTF-8 bytes, so decode encoded secrets first, such as the Base32 secret in an `otpauth://` URI.
+
+```ts
+import { base32 } from "@better-auth/utils/base32";
+import { createOTP } from "@better-auth/utils/otp";
+
+const secret = base32.decode("JBSWY3DPEHPK3PXP");
+const isValid = await createOTP(secret).verify(otp);
+```
+
 
 ## Base64
 
