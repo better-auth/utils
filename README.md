@@ -243,7 +243,7 @@ HOTP generates a one-time password based on a counter value and a secret key. Th
 import { createOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key";
 const counter = 1234;
-const otp = createOTP(secret, {
+const otp = await createOTP(secret, {
   digits: 6,
 }).hotp(counter);
 ``` 
@@ -255,7 +255,7 @@ TOTP generates a one-time password based on the current time and a secret key. T
 ```ts
 import { createOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key"
-const otp = createOTP(secret, {
+const otp = await createOTP(secret, {
   digits: 6,
   period: 30,
 }).totp();
@@ -263,22 +263,22 @@ const otp = createOTP(secret, {
 
 ### Verifying TOTP
 
-Verify a TOTP against the secret key and a specified time window. The default time window is 30 seconds.
+Verify a TOTP against the secret key and a specified time window. By default, codes from one period before and after the current one are also accepted.
 
 ```ts
 import { createOTP } from "@better-auth/utils/otp";
 const secret = "my-super-secret-key"
-const isValid = createOTP(secret, {
+const isValid = await createOTP(secret, {
   digits: 6,
   period: 30,
 }).verify(otp);
 ```
 
-You can also specify the time window in seconds.
+You can also specify the time window as the number of periods to accept on each side.
 
 ```ts
-import { createOTP } from "@better-auth/utils";
-const isValid = createOTP(secret).verify(otp, { window: 60 });
+import { createOTP } from "@better-auth/utils/otp";
+const isValid = await createOTP(secret).verify(otp, { window: 2 });
 ```
 
 ### Generate URL for Authenticator App
