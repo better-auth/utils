@@ -96,8 +96,10 @@ describe("HOTP and TOTP Generation Tests", () => {
 			result[3] = 1;
 			return buffer;
 		});
+		const importKey = vi.fn(async () => ({}));
 		vi.doMock("./hmac", () => ({
 			createHMAC: () => ({
+				importKey,
 				sign,
 			}),
 		}));
@@ -110,6 +112,7 @@ describe("HOTP and TOTP Generation Tests", () => {
 
 			expect(isValid).toBe(true);
 			expect(sign).toHaveBeenCalledTimes(3);
+			expect(importKey).toHaveBeenCalledTimes(1);
 		} finally {
 			vi.doUnmock("./hmac");
 			vi.resetModules();
