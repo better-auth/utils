@@ -29,11 +29,11 @@
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.10.1",
 		"bumpp": "^12.2.2",
-		"happy-dom": "^15.11.7",
+		"happy-dom": "^21.0.4",
 		"lefthook": "^2.1.4",
 		"tsdown": "0.22.9",
 		"typescript": "^6.0.3",
-		"vitest": "^2.1.8"
+		"vitest": "^5.1.0"
 	},
 	"exports": {
 		".": {
